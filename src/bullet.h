@@ -5,12 +5,12 @@
 #include "main.h"
 
 #ifndef BULLET_H
-#define BULLET
+#define BULLET_H
 
-#define MAX_BULLETS  10
-#define BULLET_INDEX 20
-#define BULLET_GREEN 14
-#define BULLET_RED   30
+#define MAX_BULLETS  16
+#define BULLET_INDEX 16
+#define BULLET_GREEN 13
+#define BULLET_RED   14
 #define BULLET_SPEED 8
 
 typedef struct {

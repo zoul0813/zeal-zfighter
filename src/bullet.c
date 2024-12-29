@@ -10,9 +10,9 @@ error bullet_init(void)
     for (i = 0; i < MAX_BULLETS; i++) {
         bullet_t* bullet     = &BULLETS[i];
         bullet->active       = 0;
-        bullet->sprite.tile  = BULLET_GREEN;
-        bullet->sprite.x     = 0;
-        bullet->sprite.y     = 0;
+        bullet->sprite.tile  = BULLET_RED;
+        bullet->sprite.x     = SCREEN_WIDTH + SPRITE_WIDTH;
+        bullet->sprite.y     = SPRITE_HEIGHT + (i * SPRITE_HEIGHT);
         bullet->sprite.flags = SPRITE_NONE;
         bullet->sprite_index = BULLET_INDEX + i;
         gfx_sprite_render(&vctx, bullet->sprite_index, &bullet->sprite);

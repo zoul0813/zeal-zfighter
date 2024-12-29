@@ -18,7 +18,7 @@
 
 #define LEVEL_LAYER 0
 #define UI_LAYER    1
-#define EMPTY_TILE  15
+#define EMPTY_TILE  0
 
 #define LEFT1     (input1 & BUTTON_LEFT)
 #define RIGHT1    (input1 & BUTTON_RIGHT)

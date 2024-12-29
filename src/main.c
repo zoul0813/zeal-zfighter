@@ -14,16 +14,18 @@
 
 gfx_context vctx;
 uint8_t controller_mode = 1;
-uint16_t input1_prev = 0;
+uint16_t input1_prev    = 0;
 
-int main(void) {
+int main(void)
+{
     init();
 reset:
     reset();
     load_level(0);
-    while(true) {
+    while (true) {
         uint8_t action = input();
-        if(action == ACTION_QUIT) goto quit_game;
+        if (action == ACTION_QUIT)
+            goto quit_game;
         update();
         draw();
     }
@@ -32,15 +34,19 @@ quit_game:
     return 0;
 }
 
-void handle_error(zos_err_t err, const char* message, uint8_t fatal) {
-    if(err != ERR_SUCCESS) {
-        if(fatal) deinit();
+void handle_error(zos_err_t err, const char* message, uint8_t fatal)
+{
+    if (err != ERR_SUCCESS) {
+        if (fatal)
+            deinit();
         printf("\nError[%d] (%02x) %s", err, err, message);
-        if(fatal) exit(err);
+        if (fatal)
+            exit(err);
     }
 }
 
-void init(void) {
+void init(void)
+{
     zos_err_t err;
 
     err = keyboard_init();
@@ -79,13 +85,14 @@ void init(void) {
     err = bullet_init();
     handle_error(err, "failed to init bullets", 1);
 
-    err = enemy_init();
+    err = enemies_init();
     handle_error(err, "failed to init enemies", 1);
 
     gfx_enable_screen(1);
 }
 
-void deinit(void) {
+void deinit(void)
+{
     // reset screen
     ioctl(DEV_STDOUT, CMD_RESET_SCREEN, NULL);
 
@@ -95,15 +102,17 @@ void deinit(void) {
     err = bullet_deinit();
     handle_error(err, "failed to deinit bullets", 1);
 
-    err = enemy_deinit();
+    err = enemies_deinit();
     handle_error(err, "failed to deinit enemies", 1);
 }
 
-void reset(void) {
+void reset(void)
+{
     // reset your game state
 }
 
-uint8_t input(void) {
+uint8_t input(void)
+{
     uint16_t input1 = keyboard_read();
     if (controller_mode == 1) {
         input1 |= controller_read();
@@ -111,50 +120,107 @@ uint8_t input(void) {
 
     player.direction.x = DIRECTION_NONE;
     player.direction.y = DIRECTION_NONE;
-    if(LEFT1) player.direction.x = DIRECTION_LEFT;
-    if(RIGHT1) player.direction.x = DIRECTION_RIGHT;
-    if(UP1) player.direction.y = DIRECTION_UP;
-    if(DOWN1) player.direction.y = DIRECTION_DOWN;
-    if(BUTTON1_B) {
-        BULLETS[0].active = 1;
-        BULLETS[0].direction.x = DIRECTION_RIGHT;
-        BULLETS[0].sprite.x = player.sprite_tr.x ;
-        BULLETS[0].sprite.y = player.sprite_tr.y + (SPRITE_HEIGHT / 2);
-    }
+    if (LEFT1)
+        player.direction.x = DIRECTION_LEFT;
+    if (RIGHT1)
+        player.direction.x = DIRECTION_RIGHT;
+    if (UP1)
+        player.direction.y = DIRECTION_UP;
+    if (DOWN1)
+        player.direction.y = DIRECTION_DOWN;
+    if (BUTTON1_B)
+        player_shoot();
 
-    if(SELECT1) return ACTION_QUIT;
+    if (SELECT1)
+        return ACTION_QUIT;
 
     input1_prev = input1;
     return 0;
 }
 
-error load_level(uint8_t which) {
-    (void *)which; // unreferenced
-    uint8_t y,x;
-    for(y = 0; y < HEIGHT; y++) {
-        for(x = 0; x < WIDTH; x++) {
+error load_level(uint8_t which)
+{
+    (void*) which; // unreferenced
+    uint8_t y, x;
+    for (y = 0; y < HEIGHT; y++) {
+        for (x = 0; x < WIDTH; x++) {
             gfx_tilemap_place(&vctx, EMPTY_TILE, 0, x, y);
         }
     }
     return 0;
 }
 
-void update(void) {
+void update(void)
+{
     player_move();
     bullet_move();
+    enemies_move();
+
+    player_update();
+
+    uint8_t i, j;
+    uint8_t remaining = MAX_ENEMIES;
+    for (i = 0; i < PLAYER_MAX_BULLETS; i++) {
+        if (remaining < 1)
+            goto next_spawn;
+        bullet_t* bullet = &BULLETS[i];
+        if (bullet->active == 0)
+            continue;
+
+        for (j = 0; j < MAX_ENEMIES; j++) {
+            enemy_t* enemy = &ENEMIES[j];
+            if (enemy->active == 0) {
+                remaining--;
+                continue;
+            }
+            if (bullet->sprite.x + SPRITE_WIDTH >= enemy->sprite_t.x) {
+                if ((bullet->sprite.y >= (enemy->sprite_t.y)) &&
+                    (bullet->sprite.y <= (enemy->sprite_b.y + SPRITE_HEIGHT))) {
+                    bullet->active   = 0;
+                    bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+
+                    enemy->active     = 0;
+                    enemy->sprite_t.x = SCREEN_WIDTH + SPRITE_WIDTH;
+                    enemy->sprite_b.x = SCREEN_WIDTH + SPRITE_WIDTH;
+                    remaining--;
+                    goto next_bullet;
+                }
+            }
+        }
+next_bullet:
+    }
+
+next_spawn:
+
+    if (remaining == 0) {
+        // 16..224 ((240 - 32) + 16)
+        uint8_t y = (rand8() % 128) + 56;
+        for (i = 0; i < MAX_ENEMIES; i++) {
+            enemy_t* enemy    = &ENEMIES[i];
+            enemy->sprite_t.y = y;
+            enemy->sprite_b.y = y + SPRITE_HEIGHT;
+            enemy->sprite_t.x = SCREEN_WIDTH + (SPRITE_WIDTH * i);
+            enemy->sprite_b.x = SCREEN_WIDTH + (SPRITE_WIDTH * i);
+            enemy->active     = 1;
+        }
+    }
 }
 
-void draw_paused(uint8_t paused) {
+void draw_paused(uint8_t paused)
+{
     (void*) paused; // unreferenced
 }
 
-void draw_gameover(uint8_t gameover) {
+void draw_gameover(uint8_t gameover)
+{
     (void*) gameover; // unreferenced
 }
 
-void draw(void) {
+void draw(void)
+{
     gfx_wait_vblank(&vctx);
     bullet_draw();
     player_draw();
+    enemies_draw();
     gfx_wait_end_vblank(&vctx);
 }
