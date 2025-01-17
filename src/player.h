@@ -26,6 +26,7 @@ typedef struct {
 
 typedef struct {
         uint8_t health;
+        uint16_t score;
         uint8_t sprite_index;
         gfx_sprite sprite_tl;
         gfx_sprite sprite_tr;

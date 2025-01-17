@@ -16,9 +16,12 @@
 #define WIDTH         20
 #define HEIGHT        15
 
-#define LEVEL_LAYER 0
-#define UI_LAYER    1
-#define EMPTY_TILE  0
+#define LEVEL_LAYER     0
+#define UI_LAYER        1
+#define EMPTY_TILE      0
+#define ASTEROID_TILE   12
+#define STAR_TILE       24
+#define STAR_TILE_NUM   8
 
 #define LEFT1     (input1 & BUTTON_LEFT)
 #define RIGHT1    (input1 & BUTTON_RIGHT)

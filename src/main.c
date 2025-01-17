@@ -15,6 +15,10 @@
 gfx_context vctx;
 uint8_t controller_mode = 1;
 uint16_t input1_prev    = 0;
+uint8_t frames          = 0;
+int8_t star_field_dir    = 1;
+Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
+static char text[32];
 
 int main(void)
 {
@@ -26,8 +30,13 @@ reset:
         uint8_t action = input();
         if (action == ACTION_QUIT)
             goto quit_game;
+        frames++;
+        // TSTATE_LOG(1);
         update();
+        // TSTATE_LOG(1);
+        // TSTATE_LOG(2);
         draw();
+        // TSTATE_LOG(2);
     }
 quit_game:
     deinit();
@@ -88,6 +97,15 @@ void init(void)
     err = enemies_init();
     handle_error(err, "failed to init enemies", 1);
 
+    ascii_map('0', 10, 48); // 0-9
+    ascii_map('A', 13, 64);
+    ascii_map('a', 13, 64);
+    ascii_map('N', 13, 80);
+    ascii_map('n', 13, 80);
+
+    sprintf(text, "%05d", player.score);
+    nprint_string(&vctx, text, 5, 0, 0);
+
     gfx_enable_screen(1);
 }
 
@@ -138,31 +156,63 @@ uint8_t input(void)
     return 0;
 }
 
+/**
+ * generate new starfields for screens 1 and 4
+ */
+void generate_starfield1(void) {
+    uint8_t y, x, r, t;
+    // screen 1 and 4 are always the same?
+    for (y = 0; y < 15; y++) {
+        for (x = 0; x < 20; x++) {
+            r = rand8();
+            r = r > 250;
+            t = rand8() % STAR_TILE_NUM;
+            // screen 1
+            gfx_tilemap_place(&vctx, r ? STAR_TILE + t : EMPTY_TILE, 0, x, y);
+            gfx_tilemap_place(&vctx, r ? STAR_TILE + t : EMPTY_TILE, 0, x, 15 + y);
+            // screen 4
+            gfx_tilemap_place(&vctx, r ? STAR_TILE + t : EMPTY_TILE, 0, 60 + x, y);
+            gfx_tilemap_place(&vctx, r ? STAR_TILE + t : EMPTY_TILE, 0, 60 + x, 15 + y);
+        }
+    }
+}
+
+/**
+ * generate new starfields for screens 2 and 3
+ */
+void generate_starfield2(void) {
+    uint8_t y, x, r, t;
+    for (y = 0; y < 15; y++) {
+        for (x = 20; x < 60; x++) {
+            r = rand8();
+            r = r > 250;
+            t = rand8() % STAR_TILE_NUM;
+            gfx_tilemap_place(&vctx, r ? STAR_TILE + t : EMPTY_TILE, 0, x, y);
+            gfx_tilemap_place(&vctx, r ? STAR_TILE + t : EMPTY_TILE, 0, x, 15 + y);
+        }
+    }
+}
+
 error load_level(uint8_t which)
 {
     (void*) which; // unreferenced
-    uint8_t y, x;
-    for (y = 0; y < HEIGHT; y++) {
-        for (x = 0; x < WIDTH; x++) {
-            gfx_tilemap_place(&vctx, EMPTY_TILE, 0, x, y);
-        }
-    }
+    generate_starfield1();
+    generate_starfield2();
     return 0;
 }
 
 void update(void)
 {
+    uint8_t i, j;
+
     player_move();
     bullet_move();
     enemies_move();
 
     player_update();
 
-    uint8_t i, j;
-    uint8_t remaining = MAX_ENEMIES;
+    if (!enemies_active()) goto next_spawn;
     for (i = 0; i < PLAYER_MAX_BULLETS; i++) {
-        if (remaining < 1)
-            goto next_spawn;
         bullet_t* bullet = &BULLETS[i];
         if (bullet->active == 0)
             continue;
@@ -170,19 +220,25 @@ void update(void)
         for (j = 0; j < MAX_ENEMIES; j++) {
             enemy_t* enemy = &ENEMIES[j];
             if (enemy->active == 0) {
-                remaining--;
                 continue;
             }
-            if (bullet->sprite.x + SPRITE_WIDTH >= enemy->sprite_t.x) {
-                if ((bullet->sprite.y >= (enemy->sprite_t.y)) &&
-                    (bullet->sprite.y <= (enemy->sprite_b.y + SPRITE_HEIGHT))) {
+            if (
+                (bullet->sprite.x + SPRITE_WIDTH >= enemy->sprite_t.x)
+                &&
+                (bullet->sprite.x + SPRITE_WIDTH <= enemy->sprite_t.x + SPRITE_WIDTH)
+            ) {
+                if (
+                    (bullet->sprite.y >= (enemy->sprite_t.y))
+                    &&
+                    (bullet->sprite.y <= (enemy->sprite_b.y + SPRITE_HEIGHT))
+                ) {
                     bullet->active   = 0;
                     bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
 
-                    enemy->active     = 0;
-                    enemy->sprite_t.x = SCREEN_WIDTH + SPRITE_WIDTH;
-                    enemy->sprite_b.x = SCREEN_WIDTH + SPRITE_WIDTH;
-                    remaining--;
+                    enemy_destroy(enemy);
+                    player.score++;
+                    sprintf(text, "%05d", player.score);
+                    nprint_string(&vctx, text, 5, 0, 0);
                     goto next_bullet;
                 }
             }
@@ -190,18 +246,26 @@ void update(void)
 next_bullet:
     }
 
+    if (!enemies_active()) {
 next_spawn:
+        enemies_spawn((rand8() % 64) + 88);
+    }
 
-    if (remaining == 0) {
-        // 16..224 ((240 - 32) + 16)
-        uint8_t y = (rand8() % 128) + 56;
-        for (i = 0; i < MAX_ENEMIES; i++) {
-            enemy_t* enemy    = &ENEMIES[i];
-            enemy->sprite_t.y = y;
-            enemy->sprite_b.y = y + SPRITE_HEIGHT;
-            enemy->sprite_t.x = SCREEN_WIDTH + (SPRITE_WIDTH * i);
-            enemy->sprite_b.x = SCREEN_WIDTH + (SPRITE_WIDTH * i);
-            enemy->active     = 1;
+    star_field_pos.x++;
+    if(star_field_pos.x == 960) {
+        // generate new fields for panels 2 and 3
+        star_field_pos.x = 0;
+        generate_starfield2();
+    }
+    if(star_field_pos.x == 480) {
+        // generate new field for panels 1 and 4
+        generate_starfield1();
+    }
+
+    if(frames % 32 == 0) {
+        star_field_pos.y += star_field_dir;
+        if(star_field_pos.y == 239 || star_field_pos.y == 0) {
+            star_field_dir *= -1;
         }
     }
 }
@@ -222,5 +286,29 @@ void draw(void)
     bullet_draw();
     player_draw();
     enemies_draw();
+
+    // scroll tilemap
+    zvb_ctrl_l0_scr_x_low = star_field_pos.x & 0xFF;
+    zvb_ctrl_l0_scr_x_high = star_field_pos.x >> 8;
+    // zvb_ctrl_l0_scr_x_high = 0;
+    zvb_ctrl_l0_scr_y_low = star_field_pos.y & 0xFF;
+    // zvb_ctrl_l0_scr_y_high = star_field_pos.y >> 8;
+    zvb_ctrl_l0_scr_y_high = 0;
+
+    // char text[16];
+    // sprintf(text, "%05d", player.score);
+    // nprint_string(&vctx, text, 5, 0, 0);
+
+    // uint8_t value;
+    // DEBUG
+    // sprintf(text, "%05d", star_field_pos.x);
+    // nprint_string(&vctx, text, 5, 14, 0);
+    // sprintf(text, "%05d", star_field_pos.x >>  7);
+    // nprint_string(&vctx, text, 5, 14, 1);
+
+    // // DEBUG
+    // value = enemies_active();
+    // sprintf(text, "%02d", value);
+    // nprint_string(&vctx, text, 2, 18, 14);
     gfx_wait_end_vblank(&vctx);
 }
