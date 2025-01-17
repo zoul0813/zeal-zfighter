@@ -1,11 +1,15 @@
 #include <zgdk.h>
 #include "enemy.h"
 #include "main.h"
+#include "bullet.h"
+#include "player.h"
 
 #define ENEMY_T 4;
 
 enemy_t ENEMIES[MAX_ENEMIES];
 static uint8_t total_active = 0;
+static uint8_t total_bullets = 0;
+static uint8_t frames = 0;
 
 // ./tools/wavegen.py -a 42
 static int8_t WAVE1[] = {
@@ -164,6 +168,46 @@ inline uint8_t enemies_active(void) {
     return total_active;
 }
 
+void enemies_update(void) {
+    uint8_t i, r;
+    if(total_active == 0) return;
+
+    frames++;
+
+    // once per second?
+    // if((frames & 0x3F) == 0) {
+    if((frames & 0x1F) == 0) {
+        r = rand8() % total_active;
+        for(i = 0; i < total_active; i++) {
+            enemy_t *self = &ENEMIES[i];
+            if(!self->active) {
+                // we found our enemy, but he's inactive, use the next
+                if(r == i) r++;
+                continue;
+            }
+            // this isn't the enemy you're looking for
+            if(r != i) continue;
+
+            total_bullets++;
+            if (total_bullets >= ENEMY_MAX_BULLETS);
+                total_bullets = 0;
+
+            bullet_t* bullet = &BULLETS[total_bullets + PLAYER_MAX_BULLETS];
+            if (bullet->active)
+                return; // this bullet is still in use
+
+            bullet->active      = 1;
+            bullet->sprite.tile = BULLET_RED;
+            bullet->direction.x = DIRECTION_LEFT;
+            bullet->sprite.x    = self->sprite_t.x;
+            bullet->sprite.y    = self->sprite_b.y + 2;
+
+
+            break; // we only need the first enemy
+        }
+    }
+}
+
 void enemy_move(enemy_t* self)
 {
     if (self->active == 0)
@@ -229,7 +273,7 @@ void enemy_destroy(enemy_t *self) {
     self->active     = 0;
     self->sprite_t.x = SCREEN_WIDTH + (SPRITE_WIDTH * 2);
     self->sprite_b.x = self->sprite_t.x;
-    total_active--;
+    if(total_active > 0) total_active--;
 }
 
 void enemies_move(void)

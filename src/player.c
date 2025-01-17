@@ -17,8 +17,10 @@ error player_init(void)
     gfx_error err;
     uint8_t index       = 0;
     player.sprite_index = index;
+    player.lives        = 3;
     player.health       = 5;
     player.bullet       = 0;
+    player.bullet_lock  = 0;
 
     // ship
     {
@@ -144,6 +146,7 @@ error player_deinit(void)
 
 void player_shoot(void)
 {
+    if(player.bullet_lock > 0) return;
     player.bullet++;
     if (player.bullet >= PLAYER_MAX_BULLETS)
         player.bullet = 0;
@@ -156,10 +159,41 @@ void player_shoot(void)
     bullet->direction.x = DIRECTION_RIGHT;
     bullet->sprite.x    = player.sprite_br.x;
     bullet->sprite.y    = player.sprite_br.y + 2;
+    player.bullet_lock = PLAYER_BULLET_FREQ;
+}
+
+void player_damaged(uint8_t damage) {
+    if(player.health <= damage) {
+        player.health = 0;
+        player.sprite_tl.tile = PLAYER_TL;
+        player.sprite_tr.tile = PLAYER_TR;
+        player.sprite_bl.tile = PLAYER_TL;
+        player.sprite_br.tile = PLAYER_TR;
+        player.shield.active = 1;
+        return;
+    }
+
+    player.health -= damage;
+    if(player.health < 6) {
+        player.shield.active = 0;
+    }
+    if(player.health < 5) {
+        player.sprite_tl.tile = PLAYER_TL_DMG;
+    }
+    if(player.health < 4) {
+        player.sprite_br.tile = PLAYER_BR_DMG;
+    }
+    if(player.health < 3) {
+        player.sprite_bl.tile = PLAYER_BL_DMG;
+    }
+    if(player.health < 2) {
+        player.sprite_tr.tile = PLAYER_TR_DMG;
+    }
 }
 
 void player_update(void)
 {
+    if(player.bullet_lock > 0) player.bullet_lock--;
     if (player.health < 5) {}
 
     if (player.shield.active) {

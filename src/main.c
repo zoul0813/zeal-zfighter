@@ -106,6 +106,19 @@ void init(void)
     sprintf(text, "%05d", player.score);
     nprint_string(&vctx, text, 5, 0, 0);
 
+    for(uint8_t l = 1; l < 4; l++) {
+        if(player.lives >= l) {
+            gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
+        } else {
+            gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
+        }
+    }
+
+    sprintf(text, "%03d", player.lives);
+    nprint_string(&vctx, text, 3, 17, 13);
+    sprintf(text, "%03d", player.health);
+    nprint_string(&vctx, text, 3, 17, 14);
+
     gfx_enable_screen(1);
 }
 
@@ -210,38 +223,85 @@ void update(void)
     enemies_move();
 
     player_update();
+    enemies_update();
 
     if (!enemies_active()) goto next_spawn;
-    for (i = 0; i < PLAYER_MAX_BULLETS; i++) {
+    for (i = 0; i < MAX_BULLETS; i++) {
         bullet_t* bullet = &BULLETS[i];
         if (bullet->active == 0)
             continue;
 
-        for (j = 0; j < MAX_ENEMIES; j++) {
-            enemy_t* enemy = &ENEMIES[j];
-            if (enemy->active == 0) {
-                continue;
-            }
-            if (
-                (bullet->sprite.x + SPRITE_WIDTH >= enemy->sprite_t.x)
-                &&
-                (bullet->sprite.x + SPRITE_WIDTH <= enemy->sprite_t.x + SPRITE_WIDTH)
-            ) {
+        if(bullet->direction.x == DIRECTION_RIGHT) {
+            for (j = 0; j < MAX_ENEMIES; j++) {
+                enemy_t* enemy = &ENEMIES[j];
+                if (enemy->active == 0) {
+                    continue;
+                }
                 if (
-                    (bullet->sprite.y >= (enemy->sprite_t.y))
+                    (bullet->sprite.x + SPRITE_WIDTH >= enemy->sprite_t.x)
                     &&
-                    (bullet->sprite.y <= (enemy->sprite_b.y + SPRITE_HEIGHT))
+                    (bullet->sprite.x + SPRITE_WIDTH <= enemy->sprite_t.x + SPRITE_WIDTH)
                 ) {
-                    bullet->active   = 0;
-                    bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+                    if (
+                        (bullet->sprite.y >= (enemy->sprite_t.y))
+                        &&
+                        (bullet->sprite.y <= (enemy->sprite_b.y + SPRITE_HEIGHT))
+                    ) {
+                        bullet->active   = 0;
+                        bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
 
-                    enemy_destroy(enemy);
-                    player.score++;
-                    sprintf(text, "%05d", player.score);
-                    nprint_string(&vctx, text, 5, 0, 0);
-                    goto next_bullet;
+                        enemy_destroy(enemy);
+                        player.score++;
+                        sprintf(text, "%05d", player.score);
+                        nprint_string(&vctx, text, 5, 0, 0);
+                        goto next_bullet;
+                    }
                 }
             }
+        } else {
+                if (
+                    (bullet->sprite.x + SPRITE_WIDTH >= player.sprite_tl.x)
+                    &&
+                    (bullet->sprite.x + SPRITE_WIDTH <= player.sprite_tr.x + SPRITE_WIDTH)
+                ) {
+                    if (
+                        (bullet->sprite.y >= (player.sprite_tl.y))
+                        &&
+                        (bullet->sprite.y <= (player.sprite_bl.y + SPRITE_HEIGHT))
+                    ) {
+                        bullet->active   = 0;
+                        bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+
+                        player_damaged(1);
+                        if(player.health == 0) {
+                            msleep(500);
+                            for(uint8_t e = 0; e < MAX_ENEMIES; e++) {
+                                enemy_destroy(&ENEMIES[e]);
+                            }
+
+                            player.health = PLAYER_MAX_HEALTH;
+                            player.lives--;
+                            for(uint8_t l = 1; l < 4; l++) {
+                                if(player.lives >= l) {
+                                    gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
+                                } else {
+                                    gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
+                                }
+                            }
+                            if(player.lives == 0) {
+                                msleep(500);
+                                player.lives = PLAYER_MAX_LIVES;
+                                player.health = PLAYER_MAX_HEALTH;
+                            }
+                        }
+
+                        sprintf(text, "%03d", player.lives);
+                        nprint_string(&vctx, text, 3, 17, 13);
+                        sprintf(text, "%03d", player.health);
+                        nprint_string(&vctx, text, 3, 17, 14);
+                        goto next_bullet;
+                    }
+                }
         }
 next_bullet:
     }

@@ -27,8 +27,8 @@
 #define RIGHT1    (input1 & BUTTON_RIGHT)
 #define UP1       (input1 & BUTTON_UP)
 #define DOWN1     (input1 & BUTTON_DOWN)
-#define BUTTON1_B ((input1 & BUTTON_B) && (input1_prev ^ BUTTON_B))
-#define BUTTON1_A ((input1 & BUTTON_A) && (input1_prev ^ BUTTON_A))
+#define BUTTON1_B (input1 & BUTTON_B)
+#define BUTTON1_A (input1 & BUTTON_A)
 #define START1    (input1 & BUTTON_START)
 #define SELECT1   (input1 & BUTTON_SELECT)
 

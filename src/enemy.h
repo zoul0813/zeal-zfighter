@@ -6,9 +6,10 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#define ENEMY_INDEX     32
-#define MAX_ENEMIES     16
-#define ENEMY_OFFSET    48
+#define ENEMY_INDEX         32
+#define MAX_ENEMIES         16
+#define ENEMY_MAX_BULLETS   12
+#define ENEMY_OFFSET        48
 
 typedef enum {
     F_SINE      = 0,
@@ -39,6 +40,7 @@ void enemy_move(enemy_t* self);
 void enemy_draw(enemy_t* self);
 void enemy_destroy(enemy_t *self);
 void enemies_move(void);
+void enemies_update(void);
 void enemies_draw(void);
 void enemies_spawn(uint16_t y);
 uint8_t enemies_active(void);
