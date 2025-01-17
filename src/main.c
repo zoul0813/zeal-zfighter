@@ -288,12 +288,7 @@ void draw(void)
     enemies_draw();
 
     // scroll tilemap
-    zvb_ctrl_l0_scr_x_low = star_field_pos.x & 0xFF;
-    zvb_ctrl_l0_scr_x_high = star_field_pos.x >> 8;
-    // zvb_ctrl_l0_scr_x_high = 0;
-    zvb_ctrl_l0_scr_y_low = star_field_pos.y & 0xFF;
-    // zvb_ctrl_l0_scr_y_high = star_field_pos.y >> 8;
-    zvb_ctrl_l0_scr_y_high = 0;
+    tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl.y >> 2));
 
     // char text[16];
     // sprintf(text, "%05d", player.score);
@@ -301,9 +296,9 @@ void draw(void)
 
     // uint8_t value;
     // DEBUG
-    // sprintf(text, "%05d", star_field_pos.x);
+    // sprintf(text, "%05d", star_field_pos.y);
     // nprint_string(&vctx, text, 5, 14, 0);
-    // sprintf(text, "%05d", star_field_pos.x >>  7);
+    // sprintf(text, "%05d", player.sprite_tl.y);
     // nprint_string(&vctx, text, 5, 14, 1);
 
     // // DEBUG
