@@ -11,6 +11,13 @@ static uint8_t total_active = 0;
 static uint8_t total_bullets = 0;
 static uint8_t frames = 0;
 
+static uint16_t palettes[4][5] = {
+    { 0x4244, 0x6326, 0x8CA8, 0x9D2A, 0xADAC, }, // yellow
+    { 0x2109, 0x318C, 0x42D2, 0x5394, 0x6436, }, // dark blue
+    { 0x2249, 0x32AC, 0x43F2, 0x5454, 0x65B6, }, // light blue
+    { 0x2246, 0x3327, 0x44AA, 0x552B, 0x65AD, }, // green
+};
+
 // ./tools/wavegen.py -a 42
 static int8_t WAVE1[] = {
     64, 63, 63, 63, 63, 63, 63, 63, 62, 62, 62, 61, 61, 60, 60, 59,
@@ -120,6 +127,9 @@ void enemies_spawn(uint16_t origin_y) {
     uint8_t count = (rand8() % (MAX_ENEMIES - 3)) + 3;
     // make sure we have an even number of ships if > 8
     if((count > 8) && ((count & 0x1) == 1)) count--;
+
+    uint8_t color = rand8() % 4;
+    gfx_palette_load(&vctx, &palettes[color], 10, ENEMY_PALETTE);
 
     for (uint8_t i = 0; i < count; i++) {
         enemy_t* self    = &ENEMIES[i];

@@ -10,6 +10,7 @@
 #define MAX_ENEMIES         16
 #define ENEMY_MAX_BULLETS   12
 #define ENEMY_OFFSET        48
+#define ENEMY_PALETTE       206
 
 typedef enum {
     F_SINE      = 0,
