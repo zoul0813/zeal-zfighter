@@ -20,6 +20,21 @@ int8_t star_field_dir    = 1;
 Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
 static char text[32];
 
+pattern_t pattern0;
+pattern_t pattern1;
+pattern_t pattern2;
+pattern_t pattern3;
+track_t track = {
+    .title = "Shooter",
+    .patterns = {
+        &pattern0,
+        &pattern1,
+        &pattern2,
+        &pattern3,
+    }
+};
+const size_t TRACK_SIZE = sizeof(track);
+
 int main(void)
 {
     init();
@@ -27,6 +42,8 @@ reset:
     reset();
     load_level(0);
     while (true) {
+        sound_loop();
+        zmt_tick(&track, 1);
         uint8_t action = input();
         if (action == ACTION_QUIT)
             goto quit_game;
@@ -119,11 +136,17 @@ void init(void)
     sprintf(text, "%03d", player.health);
     nprint_string(&vctx, text, 3, 17, 14);
 
+    sound_init();
+    Sound *bullet = sound_get(BULLET_SOUND);
+    bullet->waveform = WAV_SAWTOOTH;
+
     gfx_enable_screen(1);
 }
 
 void deinit(void)
 {
+    sound_deinit();
+
     // reset screen
     ioctl(DEV_STDOUT, CMD_RESET_SCREEN, NULL);
 
@@ -211,6 +234,8 @@ error load_level(uint8_t which)
     (void*) which; // unreferenced
     generate_starfield1();
     generate_starfield2();
+
+    load_zmt(&track, 0);
     return 0;
 }
 
@@ -274,6 +299,7 @@ void update(void)
 
                         player_damaged(1);
                         if(player.health == 0) {
+                            sound_stop_all();
                             msleep(500);
                             for(uint8_t e = 0; e < MAX_ENEMIES; e++) {
                                 enemy_destroy(&ENEMIES[e]);
@@ -289,9 +315,11 @@ void update(void)
                                 }
                             }
                             if(player.lives == 0) {
+                                sound_stop_all();
                                 msleep(500);
                                 player.lives = PLAYER_MAX_LIVES;
                                 player.health = PLAYER_MAX_HEALTH;
+                                player.score = 0;
                             }
                         }
 

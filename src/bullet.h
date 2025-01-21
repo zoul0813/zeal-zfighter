@@ -12,6 +12,7 @@
 #define BULLET_GREEN 13
 #define BULLET_RED   14
 #define BULLET_SPEED 8
+#define BULLET_SOUND 3
 
 typedef struct {
         uint8_t active;

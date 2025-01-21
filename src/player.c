@@ -160,6 +160,8 @@ void player_shoot(void)
     bullet->sprite.x    = player.sprite_br.x;
     bullet->sprite.y    = player.sprite_br.y + 2;
     player.bullet_lock = PLAYER_BULLET_FREQ;
+
+    sound_play(BULLET_SOUND, 220, 2);
 }
 
 void player_damaged(uint8_t damage) {

@@ -58,7 +58,7 @@ BIN=shooter.bin
 
 # ZGDK has sound enabled by default, uncomment this to disable sound and reduce your binary size
 ENABLE_GFX=1
-ENABLE_SOUND=0
+ENABLE_SOUND=1
 # ENABLE_CRC32=1
 
 ##

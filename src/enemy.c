@@ -180,7 +180,7 @@ void enemies_update(void) {
         r = rand8() % total_active;
         for(i = 0; i < total_active; i++) {
             enemy_t *self = &ENEMIES[i];
-            if(!self->active) {
+            if(!self->active || self->sprite_t.x > SCREEN_WIDTH) {
                 // we found our enemy, but he's inactive, use the next
                 if(r == i) r++;
                 continue;
@@ -201,6 +201,7 @@ void enemies_update(void) {
             bullet->direction.x = DIRECTION_LEFT;
             bullet->sprite.x    = self->sprite_t.x;
             bullet->sprite.y    = self->sprite_b.y + 2;
+            sound_play(BULLET_SOUND, 180, 2);
 
 
             break; // we only need the first enemy
