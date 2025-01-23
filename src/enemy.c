@@ -5,12 +5,12 @@
 #include "player.h"
 
 #define SPRITE_FLAGS    SPRITE_BEHIND_FG
+#define SPAWN_DERLAY    128
 
 enemy_t ENEMIES[MAX_ENEMIES];
 static uint8_t total_active = 0;
 static uint8_t total_bullets = 0;
-static uint8_t frames = 0;
-
+static uint8_t spawn_timer = 0;
 static uint16_t palettes[4][5] = {
     { 0x4244, 0x6326, 0x8CA8, 0x9D2A, 0xADAC, }, // yellow
     { 0x2109, 0x318C, 0x42D2, 0x5394, 0x6436, }, // dark blue
@@ -121,6 +121,11 @@ error enemies_deinit(void)
 }
 
 void enemies_spawn(uint16_t origin_y) {
+    if(spawn_timer != 0) {
+        spawn_timer--;
+        return;
+    }
+
     uint16_t last_x = 0, next_x = SCREEN_WIDTH + SPRITE_WIDTH, next_y = origin_y;
     uint8_t formation = rand8() % 4;
     // formation = F_SINE; // TODO: debug
@@ -176,6 +181,7 @@ void enemies_spawn(uint16_t origin_y) {
     }
 
     total_active = count;
+    spawn_timer = (rand8() % SPAWN_DERLAY) + 32;
 }
 
 inline uint8_t enemies_active(void) {
