@@ -12,6 +12,8 @@
 
 player_t player;
 
+#define SPRITE_FLAGS    SPRITE_BEHIND_FG
+
 error player_init(void)
 {
     gfx_error err;
@@ -27,7 +29,7 @@ error player_init(void)
         player.sprite_tl.tile  = PLAYER_TL;
         player.sprite_tl.x     = 64;
         player.sprite_tl.y     = 64;
-        player.sprite_tl.flags = SPRITE_NONE;
+        player.sprite_tl.flags = SPRITE_FLAGS;
         err                    = gfx_sprite_render(&vctx, index, &player.sprite_tl);
         if (err != GFX_SUCCESS)
             return err;
@@ -35,7 +37,7 @@ error player_init(void)
         player.sprite_tr.tile  = PLAYER_TR;
         player.sprite_tr.x     = player.sprite_tr.x + SPRITE_WIDTH;
         player.sprite_tr.y     = player.sprite_tr.y;
-        player.sprite_tr.flags = SPRITE_NONE;
+        player.sprite_tr.flags = SPRITE_FLAGS;
         err                    = gfx_sprite_render(&vctx, ++index, &player.sprite_tr);
         if (err != GFX_SUCCESS)
             return err;
@@ -43,7 +45,7 @@ error player_init(void)
         player.sprite_bl.tile  = PLAYER_TL;
         player.sprite_bl.x     = player.sprite_tl.x;
         player.sprite_bl.y     = player.sprite_tl.y + SPRITE_HEIGHT;
-        player.sprite_bl.flags = SPRITE_FLIP_Y;
+        player.sprite_bl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         err                    = gfx_sprite_render(&vctx, ++index, &player.sprite_bl);
         if (err != GFX_SUCCESS)
             return err;
@@ -51,7 +53,7 @@ error player_init(void)
         player.sprite_br.tile  = PLAYER_TR;
         player.sprite_br.x     = player.sprite_tr.x;
         player.sprite_br.y     = player.sprite_br.y + SPRITE_HEIGHT;
-        player.sprite_br.flags = SPRITE_FLIP_Y;
+        player.sprite_br.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         err                    = gfx_sprite_render(&vctx, ++index, &player.sprite_br);
         if (err != GFX_SUCCESS)
             return err;
@@ -67,7 +69,7 @@ error player_init(void)
         shield->sprite_tl.tile  = 20;
         shield->sprite_tl.x     = player.sprite_tl.x;
         shield->sprite_tl.y     = player.sprite_tl.y - SPRITE_HEIGHT;
-        shield->sprite_tl.flags = SPRITE_NONE;
+        shield->sprite_tl.flags = SPRITE_FLAGS;
         err                     = gfx_sprite_render(&vctx, index, &shield->sprite_tl);
         if (err != GFX_SUCCESS)
             return err;
@@ -75,7 +77,7 @@ error player_init(void)
         shield->sprite_t.tile  = 21;
         shield->sprite_t.x     = player.sprite_tr.x;
         shield->sprite_t.y     = player.sprite_tr.y - SPRITE_HEIGHT;
-        shield->sprite_t.flags = SPRITE_NONE;
+        shield->sprite_t.flags = SPRITE_FLAGS;
         err                    = gfx_sprite_render(&vctx, ++index, &shield->sprite_t);
         if (err != GFX_SUCCESS)
             return err;
@@ -83,7 +85,7 @@ error player_init(void)
         shield->sprite_tr.tile  = 22;
         shield->sprite_tr.x     = player.sprite_tr.x + SPRITE_WIDTH;
         shield->sprite_tr.y     = player.sprite_tr.y - SPRITE_HEIGHT;
-        shield->sprite_tr.flags = SPRITE_NONE;
+        shield->sprite_tr.flags = SPRITE_FLAGS;
         err                     = gfx_sprite_render(&vctx, ++index, &shield->sprite_tr);
         if (err != GFX_SUCCESS)
             return err;
@@ -91,7 +93,7 @@ error player_init(void)
         shield->sprite_r1.tile  = 23;
         shield->sprite_r1.x     = player.sprite_tr.x + SPRITE_WIDTH;
         shield->sprite_r1.y     = player.sprite_tr.y;
-        shield->sprite_r1.flags = SPRITE_NONE;
+        shield->sprite_r1.flags = SPRITE_FLAGS;
         err                     = gfx_sprite_render(&vctx, ++index, &shield->sprite_r1);
         if (err != GFX_SUCCESS)
             return err;
@@ -99,7 +101,7 @@ error player_init(void)
         shield->sprite_r2.tile  = 23;
         shield->sprite_r2.x     = player.sprite_br.x + SPRITE_WIDTH;
         shield->sprite_r2.y     = player.sprite_tr.y;
-        shield->sprite_r2.flags = SPRITE_FLIP_Y;
+        shield->sprite_r2.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         err                     = gfx_sprite_render(&vctx, ++index, &shield->sprite_r2);
         if (err != GFX_SUCCESS)
             return err;
@@ -107,7 +109,7 @@ error player_init(void)
         shield->sprite_br.tile  = 22;
         shield->sprite_br.x     = player.sprite_br.x + SPRITE_WIDTH;
         shield->sprite_br.y     = player.sprite_br.y + SPRITE_HEIGHT;
-        shield->sprite_br.flags = SPRITE_FLIP_Y;
+        shield->sprite_br.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         err                     = gfx_sprite_render(&vctx, ++index, &shield->sprite_br);
         if (err != GFX_SUCCESS)
             return err;
@@ -115,7 +117,7 @@ error player_init(void)
         shield->sprite_b.tile  = 21;
         shield->sprite_b.x     = player.sprite_tr.x;
         shield->sprite_b.y     = player.sprite_tr.y + SPRITE_HEIGHT;
-        shield->sprite_b.flags = SPRITE_FLIP_Y;
+        shield->sprite_b.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         err                    = gfx_sprite_render(&vctx, ++index, &shield->sprite_b);
         if (err != GFX_SUCCESS)
             return err;
@@ -123,7 +125,7 @@ error player_init(void)
         shield->sprite_bl.tile  = 20;
         shield->sprite_bl.x     = player.sprite_bl.x;
         shield->sprite_bl.y     = player.sprite_bl.y - SPRITE_HEIGHT;
-        shield->sprite_bl.flags = SPRITE_FLIP_Y;
+        shield->sprite_bl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         err                     = gfx_sprite_render(&vctx, ++index, &shield->sprite_bl);
         if (err != GFX_SUCCESS)
             return err;
@@ -197,16 +199,7 @@ uint8_t player_destroyed(void) {
     player.health = PLAYER_MAX_HEALTH;
     player.lives--;
 
-    uint8_t lives[3];
-    for(uint8_t l = 1; l < 4; l++) {
-        if(player.lives >= l) {
-            // gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
-            lives[l-1] = PLAYER_LIVES_TILE;
-        } else {
-            lives[l-1] = EMPTY_TILE;
-        }
-    }
-    gfx_tilemap_load(&vctx, lives, 3, 1, 0, 14);
+    player_draw_lives(0, HEIGHT-1);
 
     return player.lives;
 }
@@ -322,4 +315,17 @@ void player_draw(void)
         err = gfx_sprite_render(&vctx, ++index, &player.shield.sprite_b);
         err = gfx_sprite_render(&vctx, ++index, &player.shield.sprite_bl);
     }
+}
+
+void player_draw_lives(uint8_t x, uint8_t y) {
+    uint8_t lives[3];
+    for(uint8_t l = 1; l < 4; l++) {
+        if(player.lives >= l) {
+            // gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
+            lives[l-1] = PLAYER_LIVES_TILE;
+        } else {
+            lives[l-1] = EMPTY_TILE;
+        }
+    }
+    gfx_tilemap_load(&vctx, lives, 3, 1, x, y);
 }

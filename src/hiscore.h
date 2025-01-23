@@ -1,0 +1,26 @@
+#include <stdint.h>
+
+#ifndef HISCORE_H
+#define HISCORE_H
+
+#define HISCORES_COUNT  10
+
+typedef struct {
+    char initials[3];
+    uint16_t score;
+} highscore_t;
+
+void hiscore_init(uint8_t controller);
+
+/**
+ * @brief Show the hiscore table
+ */
+void hiscore_show(void);
+
+/**
+ * @brief add a score to the table
+ * @return -1 if score is too low, otherwise the index on the table (ie; 0 for highest score)
+ */
+int8_t hiscore_add(uint16_t score);
+
+#endif

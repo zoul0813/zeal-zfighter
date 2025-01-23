@@ -11,6 +11,7 @@
 #include "bullet.h"
 #include "enemy.h"
 #include "main.h"
+#include "hiscore.h"
 
 gfx_context vctx;
 uint8_t controller_mode = 1;
@@ -40,7 +41,9 @@ int main(void)
     init();
 reset:
     reset();
+
     load_level(0);
+
     while (true) {
         sound_loop();
         zmt_tick(&track, 1);
@@ -90,6 +93,8 @@ void init(void)
         controller_mode = 0;
     }
 
+    hiscore_init(controller_mode);
+
     // disable the screen to prevent artifacts from showing
     gfx_enable_screen(0);
 
@@ -114,6 +119,7 @@ void init(void)
     err = enemies_init();
     handle_error(err, "failed to init enemies", 1);
 
+    ascii_map(' ', 1, EMPTY_TILE);
     ascii_map('0', 10, 48); // 0-9
     ascii_map('A', 13, 64); // A-M
     ascii_map('a', 13, 64); // A-M
@@ -233,6 +239,10 @@ error load_level(uint8_t which)
     generate_starfield1();
     generate_starfield2();
 
+    sprintf(text, "%05d", player.score);
+    nprint_string(&vctx, text, 5, 0, 0);
+    player_draw_lives(0, HEIGHT-1);
+
     load_zmt(&track, 0);
     return 0;
 }
@@ -274,7 +284,7 @@ void update(void)
                         bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
 
                         enemy_destroy(enemy);
-                        player.score++;
+                        player.score += 5;
                         sprintf(text, "%05d", player.score);
                         nprint_string(&vctx, text, 5, 0, 0);
                         goto next_bullet;
@@ -306,6 +316,8 @@ void update(void)
                             player_destroyed();
                             if(player.lives == 0) {
                                 sound_stop_all();
+                                msleep(500);
+                                hiscore_add(player.score);
                                 msleep(500);
                                 player.lives = PLAYER_MAX_LIVES;
                                 player.health = PLAYER_MAX_HEALTH;

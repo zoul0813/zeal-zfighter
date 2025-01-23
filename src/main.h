@@ -19,6 +19,7 @@
 #define LEVEL_LAYER     0
 #define UI_LAYER        1
 #define EMPTY_TILE      0
+#define BLANK_TILE      1
 #define ASTEROID_TILE   12
 #define STAR_TILE       24
 #define STAR_TILE_NUM   8
