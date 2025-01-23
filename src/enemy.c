@@ -4,7 +4,7 @@
 #include "bullet.h"
 #include "player.h"
 
-#define ENEMY_T 4;
+// #define ENEMY_T 4;
 
 enemy_t ENEMIES[MAX_ENEMIES];
 static uint8_t total_active = 0;
@@ -96,14 +96,14 @@ error enemies_init(void)
         enemy_t* self        = &ENEMIES[i];
         self->sprite_index = ++index;
 
-        self->sprite_t.tile  = ENEMY_T;
+        self->sprite_t.tile  = ENEMY_TILE;
         self->sprite_t.flags = SPRITE_NONE;
         err                  = gfx_sprite_render(&vctx, index, &self->sprite_t);
         if (err != GFX_SUCCESS)
             return err;
 
 
-        self->sprite_b.tile  = ENEMY_T;
+        self->sprite_b.tile  = ENEMY_TILE;
         self->sprite_b.flags = SPRITE_FLIP_Y;
         err                  = gfx_sprite_render(&vctx, ++index, &self->sprite_b);
         if (err != GFX_SUCCESS)
@@ -125,6 +125,7 @@ void enemies_spawn(uint16_t origin_y) {
     uint8_t formation = rand8() % 4;
     // formation = F_SINE; // TODO: debug
     uint8_t count = (rand8() % (MAX_ENEMIES - 3)) + 3;
+    uint8_t tile = (rand8() % 10) + ENEMY_TILE;
     // make sure we have an even number of ships if > 8
     if((count > 8) && ((count & 0x1) == 1)) count--;
 
@@ -135,6 +136,9 @@ void enemies_spawn(uint16_t origin_y) {
         enemy_t* self    = &ENEMIES[i];
         self->active     = 1;
         self->y = next_y;
+        self->sprite_t.tile = tile;
+        self->sprite_b.tile = tile;
+
         self->sprite_t.x = next_x; // SCREEN_WIDTH + ((SPRITE_WIDTH * ((i * ENEMY_OFFSET) + (SPRITE_WIDTH/2))) );
         self->x = self->sprite_t.x & 0xFF;
         self->sprite_b.x = self->sprite_t.x;

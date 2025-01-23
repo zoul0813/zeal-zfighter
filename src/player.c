@@ -193,6 +193,24 @@ void player_damaged(uint8_t damage) {
     }
 }
 
+uint8_t player_destroyed(void) {
+    player.health = PLAYER_MAX_HEALTH;
+    player.lives--;
+
+    uint8_t lives[3];
+    for(uint8_t l = 1; l < 4; l++) {
+        if(player.lives >= l) {
+            // gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
+            lives[l-1] = PLAYER_LIVES_TILE;
+        } else {
+            lives[l-1] = EMPTY_TILE;
+        }
+    }
+    gfx_tilemap_load(&vctx, lives, 3, 1, 0, 14);
+
+    return player.lives;
+}
+
 void player_update(void)
 {
     if(player.bullet_lock > 0) player.bullet_lock--;

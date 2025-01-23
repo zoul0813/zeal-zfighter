@@ -115,10 +115,13 @@ void init(void)
     handle_error(err, "failed to init enemies", 1);
 
     ascii_map('0', 10, 48); // 0-9
-    ascii_map('A', 13, 64);
-    ascii_map('a', 13, 64);
-    ascii_map('N', 13, 80);
-    ascii_map('n', 13, 80);
+    ascii_map('A', 13, 64); // A-M
+    ascii_map('a', 13, 64); // A-M
+    ascii_map('N', 13, 80); // N-Z
+    ascii_map('n', 13, 80); // N-Z
+
+    tilemap_fill(&vctx, EMPTY_TILE, 0, 0, 0, WIDTH, HEIGHT);
+    tilemap_fill(&vctx, EMPTY_TILE, 1, 0, 0, WIDTH, HEIGHT);
 
     sprintf(text, "%05d", player.score);
     nprint_string(&vctx, text, 5, 0, 0);
@@ -130,11 +133,6 @@ void init(void)
             gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
         }
     }
-
-    sprintf(text, "%03d", player.lives);
-    nprint_string(&vctx, text, 3, 17, 13);
-    sprintf(text, "%03d", player.health);
-    nprint_string(&vctx, text, 3, 17, 14);
 
     sound_init();
     Sound *bullet = sound_get(BULLET_SOUND);
@@ -305,15 +303,7 @@ void update(void)
                                 enemy_destroy(&ENEMIES[e]);
                             }
 
-                            player.health = PLAYER_MAX_HEALTH;
-                            player.lives--;
-                            for(uint8_t l = 1; l < 4; l++) {
-                                if(player.lives >= l) {
-                                    gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
-                                } else {
-                                    gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
-                                }
-                            }
+                            player_destroyed();
                             if(player.lives == 0) {
                                 sound_stop_all();
                                 msleep(500);
@@ -323,10 +313,6 @@ void update(void)
                             }
                         }
 
-                        sprintf(text, "%03d", player.lives);
-                        nprint_string(&vctx, text, 3, 17, 13);
-                        sprintf(text, "%03d", player.health);
-                        nprint_string(&vctx, text, 3, 17, 14);
                         goto next_bullet;
                     }
                 }

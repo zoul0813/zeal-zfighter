@@ -13,6 +13,7 @@
 #define PLAYER_BULLET_FREQ  8
 #define PLAYER_MAX_LIVES    3
 #define PLAYER_MAX_HEALTH   8
+#define PLAYER_LIVES_TILE   15
 
 typedef struct {
         uint8_t active;
@@ -50,6 +51,7 @@ error player_init(void);
 error player_deinit(void);
 void player_shoot(void);
 void player_damaged(uint8_t damage);
+uint8_t player_destroyed(void);
 void player_update(void);
 void player_move(void);
 void player_draw(void);
