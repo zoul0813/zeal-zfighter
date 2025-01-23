@@ -18,16 +18,16 @@
 #define SELECT1   (input1 & BUTTON_SELECT)
 
 static highscore_t hiscores[10] = {
-    { .initials = { 'D', 'P', 'H' }, .score = 2000 },
-    { .initials = { 'D', 'P', 'H' }, .score = 800 },
-    { .initials = { 'D', 'P', 'H' }, .score = 700 },
-    { .initials = { 'D', 'P', 'H' }, .score = 600 },
-    { .initials = { 'D', 'P', 'H' }, .score = 500 },
-    { .initials = { 'D', 'P', 'H' }, .score = 400 },
-    { .initials = { 'D', 'P', 'H' }, .score = 300 },
-    { .initials = { 'D', 'P', 'H' }, .score = 200 },
-    { .initials = { 'D', 'P', 'H' }, .score = 100 },
-    { .initials = { 'D', 'P', 'H' }, .score = 50 },
+    { .initials = { 'D', 'P', 'H' }, .score = 4000 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 2500 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 2250 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 2000 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1750 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1500 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1250 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1000 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 750 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 500 },
 };
 static char last_initials[3] = { 'A', 'A', 'A' };
 static char buffer[16];
@@ -39,17 +39,16 @@ void hiscore_init(uint8_t controller) {
 
 void hiscore_show(void) {
     tilemap_fill(&vctx, BLANK_TILE, 1, 0, 0, WIDTH, HEIGHT);
-
-
     uint8_t i;
     for(i = 0; i < HISCORES_COUNT; i++) {
         highscore_t *score = &hiscores[i];
         sprintf(buffer, "%.3s  %05hu", score->initials, score->score);
         nprint_string(&vctx, buffer, 10, OFFSET_X, OFFSET_Y + i);
     }
+}
 
-    // msleep(5000);
-    // tilemap_fill(&vctx, BLANK_TILE, 1, 0, 0, WIDTH, HEIGHT);
+void hiscore_hide(void) {
+    tilemap_fill(&vctx, EMPTY_TILE, 1, 0, 0, WIDTH, HEIGHT);
 }
 
 int8_t hiscore_add(uint16_t score) {
@@ -58,7 +57,7 @@ int8_t hiscore_add(uint16_t score) {
     highscore_t *hiscore;
     for(i = 0; i < HISCORES_COUNT; i++) {
         hiscore = &hiscores[i];
-        if(score > hiscore->score) break;
+        if(score > hiscore->score) break; // we found your rank
     }
     if(i >= HISCORES_COUNT) return -1; // sorry, you didn't make the table!
 
@@ -68,12 +67,12 @@ int8_t hiscore_add(uint16_t score) {
         memcpy(&hiscores[j], &hiscores[j-1], sizeof(highscore_t));
     }
 
+    // update the table with your score
     hiscores->score = score;
     memcpy(&hiscore->initials, &last_initials, 3);
 
     hiscore_show();
 
-    // blink the active index???
     uint8_t frames = 0, charindex = 0;
     char c = hiscore->initials[charindex];
     uint16_t input1 = 0, last_input = 0;
@@ -117,9 +116,12 @@ int8_t hiscore_add(uint16_t score) {
         last_input = input1;
     }
 
+    // copy the last initials for the next round
+    memcpy(&last_initials, &hiscore->initials, 3);
+
     hiscore_show();
     msleep(3000);
-    tilemap_fill(&vctx, EMPTY_TILE, 1, 0, 0, WIDTH, HEIGHT);
+    hiscore_hide();
 
     return i;
 }
