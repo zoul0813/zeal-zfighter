@@ -20,7 +20,9 @@ uint16_t input1_prev    = 0;
 uint8_t frames          = 0;
 int8_t star_field_dir    = 1;
 Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
-uint8_t belt_counter = 5; // spawn a belt after 5th wave
+uint8_t wave_counter = 0;
+uint8_t asteroid_wave = 5;
+WaveType wave_type = ENEMY_WAVE;
 static char text[32];
 
 pattern_t pattern0;
@@ -52,18 +54,17 @@ reset:
     load_level(0);
 
     while (true) {
+        TSTATE_LOG(1);
         sound_loop();
         zmt_tick(&track, 1);
         uint8_t action = input();
         if (action == ACTION_QUIT)
             goto quit_game;
         frames++;
-        // TSTATE_LOG(1);
+
         update();
-        // TSTATE_LOG(1);
-        // TSTATE_LOG(2);
+        TSTATE_LOG(1);
         draw();
-        // TSTATE_LOG(2);
     }
 quit_game:
     deinit();
@@ -254,6 +255,24 @@ error load_level(uint8_t which)
     return 0;
 }
 
+void destroy_player(void) {
+    player_destroyed();
+    if(player.lives == 0) {
+        sound_stop_all();
+        gfx_wait_vblank(&vctx);
+        gfx_wait_end_vblank(&vctx);
+        msleep(500);
+        hiscore_add(player.score);
+        msleep(500);
+        player.lives = PLAYER_MAX_LIVES;
+        player.score = 0;
+    }
+
+    wave_counter = 0;
+    wave_type = ENEMY_WAVE;
+    player_spawn();
+}
+
 void update(void)
 {
     uint8_t i, j;
@@ -263,10 +282,20 @@ void update(void)
     enemies_move();
 
     player_update();
-    if(belt_counter == 0) {
-        belt_counter = belt_update();
-    } else {
-        enemies_update();
+    switch(wave_type) {
+        case BELT_SHOWER:
+            if(belt_collide(&player.rect)) {
+                belt_destroy();
+                destroy_player();
+            }
+            if(!belt_update()) {
+                wave_counter = 0;
+                wave_type = ENEMY_WAVE;
+            }
+            break;
+        case ENEMY_WAVE:
+            enemies_update();
+            break;
     }
 
     if (!enemies_active()) goto next_spawn;
@@ -324,16 +353,7 @@ void update(void)
                                 enemy_destroy(&ENEMIES[e]);
                             }
 
-                            player_destroyed();
-                            if(player.lives == 0) {
-                                sound_stop_all();
-                                msleep(500);
-                                hiscore_add(player.score);
-                                msleep(500);
-                                player.lives = PLAYER_MAX_LIVES;
-                                player.health = PLAYER_MAX_HEALTH;
-                                player.score = 0;
-                            }
+                            destroy_player();
                         }
 
                         goto next_bullet;
@@ -345,11 +365,13 @@ next_bullet:
 
     if (!enemies_active()) {
 next_spawn:
-        belt_counter--;
-        if(belt_counter == 0) {
-            belt_spawn();
-        } else {
-            enemies_spawn((rand8() % 64) + 88);
+        if(wave_counter >= asteroid_wave) {
+            wave_type = BELT_SHOWER;
+            wave_counter = belt_spawn();
+            asteroid_wave = rand8_quick() % 10 + 2;
+        }
+        if(wave_type == ENEMY_WAVE) {
+            wave_counter += enemies_spawn((rand8() % 64) + 88);
         }
     }
 
@@ -385,16 +407,20 @@ void draw_gameover(uint8_t gameover)
 void draw(void)
 {
     gfx_wait_vblank(&vctx);
+    TSTATE_LOG(2);
     bullet_draw();
     player_draw();
+    belt_draw();
     enemies_draw();
 
     // scroll tilemap
     tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl.y >> 2));
 
     // char text[16];
-    // sprintf(text, "%05d", player.score);
-    // nprint_string(&vctx, text, 5, 0, 0);
+    // sprintf(text, "%03d", wave_counter);
+    // nprint_string(&vctx, text, 3, 16, 0);
+    // sprintf(text, "%03d", wave_type);
+    // nprint_string(&vctx, text, 3, 16, 1);
 
     // uint8_t value;
     // DEBUG
@@ -407,5 +433,6 @@ void draw(void)
     // value = enemies_active();
     // sprintf(text, "%02d", value);
     // nprint_string(&vctx, text, 2, 18, 14);
+    TSTATE_LOG(2);
     gfx_wait_end_vblank(&vctx);
 }

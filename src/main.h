@@ -33,6 +33,11 @@
 #define START1    (input1 & BUTTON_START)
 #define SELECT1   (input1 & BUTTON_SELECT)
 
+typedef enum {
+    ENEMY_WAVE  = 0,
+    BELT_SHOWER = 1,
+} WaveType;
+
 typedef uint8_t error;
 
 void on_error(zos_err_t err);

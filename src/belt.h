@@ -11,8 +11,13 @@
 
 typedef enum {
     ASTEROID_SMALL = 0,
-    ASTEROID_LARGE = 1,
+    ASTEROID_LARGE1 = 1,
+    ASTEROID_LARGE2 = 2,
+    ASTEROID_LARGE3 = 3,
+    ASTEROID_LARGE4 = 4,
+    ASTEROID_LARGE5 = 5,
 } AsteroidSize;
+#define ASTEROID_SIZES  6
 
 typedef struct {
     AsteroidSize size;
@@ -23,7 +28,10 @@ typedef struct {
     Direction direction;
 } asteroid_t;
 
-void belt_spawn(void);
+uint8_t belt_spawn(void);
 uint8_t belt_update(void);
+uint8_t belt_collide(Rect *src);
+void belt_destroy(void);
+void belt_draw(void);
 
 #endif

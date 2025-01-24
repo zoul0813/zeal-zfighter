@@ -24,7 +24,6 @@
     "optional": "c",
     "ostream": "c",
     "random": "c",
-    "istream": "c",
-    "mutex": "c"
-}
+    "istream": "c"
+  }
 }

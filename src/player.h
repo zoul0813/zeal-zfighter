@@ -37,6 +37,8 @@ typedef struct {
         uint8_t bullet;
         uint8_t bullet_lock;
 
+        Rect rect;
+
         // sprites
         uint8_t sprite_index;
         gfx_sprite sprite_tl;
@@ -48,6 +50,7 @@ typedef struct {
 extern player_t player;
 
 error player_init(void);
+void player_spawn(void);
 error player_deinit(void);
 void player_shoot(void);
 void player_damaged(uint8_t damage);

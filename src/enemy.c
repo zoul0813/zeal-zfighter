@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <zgdk.h>
 #include "enemy.h"
 #include "main.h"
@@ -120,10 +121,10 @@ error enemies_deinit(void)
     return ERR_SUCCESS;
 }
 
-void enemies_spawn(uint16_t origin_y) {
+uint8_t enemies_spawn(uint16_t origin_y) {
     if(spawn_timer != 0) {
         spawn_timer--;
-        return;
+        return 0;
     }
 
     uint16_t last_x = 0, next_x = SCREEN_WIDTH + SPRITE_WIDTH, next_y = origin_y;
@@ -182,6 +183,7 @@ void enemies_spawn(uint16_t origin_y) {
 
     total_active = count;
     spawn_timer = (rand8() % SPAWN_DERLAY) + 32;
+    return 1; // wave spawned
 }
 
 inline uint8_t enemies_active(void) {
@@ -319,4 +321,8 @@ void enemies_draw(void)
     for (i = 0; i < MAX_ENEMIES; i++) {
         enemy_draw(&ENEMIES[i]);
     }
+
+    // char text[16];
+    // sprintf(text, "%03d", total_active);
+    // nprint_string(&vctx, text, 3, 16, 14);
 }

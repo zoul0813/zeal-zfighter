@@ -44,6 +44,6 @@ void enemy_destroy(enemy_t *self);
 void enemies_move(void);
 void enemies_update(void);
 void enemies_draw(void);
-void enemies_spawn(uint16_t y);
+uint8_t enemies_spawn(uint16_t y);
 uint8_t enemies_active(void);
 #endif
