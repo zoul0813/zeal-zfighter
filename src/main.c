@@ -10,6 +10,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "belt.h"
 #include "main.h"
 #include "hiscore.h"
 
@@ -19,6 +20,7 @@ uint16_t input1_prev    = 0;
 uint8_t frames          = 0;
 int8_t star_field_dir    = 1;
 Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
+uint8_t belt_counter = 5; // spawn a belt after 5th wave
 static char text[32];
 
 pattern_t pattern0;
@@ -41,6 +43,11 @@ int main(void)
     init();
 reset:
     reset();
+
+    // hiscore_show();
+    // hiscore_add(512);
+    // msleep(2000);
+    // hiscore_add(17384);
 
     load_level(0);
 
@@ -256,7 +263,11 @@ void update(void)
     enemies_move();
 
     player_update();
-    enemies_update();
+    if(belt_counter == 0) {
+        belt_counter = belt_update();
+    } else {
+        enemies_update();
+    }
 
     if (!enemies_active()) goto next_spawn;
     for (i = 0; i < MAX_BULLETS; i++) {
@@ -334,7 +345,12 @@ next_bullet:
 
     if (!enemies_active()) {
 next_spawn:
-        enemies_spawn((rand8() % 64) + 88);
+        belt_counter--;
+        if(belt_counter == 0) {
+            belt_spawn();
+        } else {
+            enemies_spawn((rand8() % 64) + 88);
+        }
     }
 
     star_field_pos.x++;

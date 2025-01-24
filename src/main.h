@@ -48,5 +48,6 @@ void draw_gameover(uint8_t gameover);
 void draw(void);
 
 extern gfx_context vctx;
+extern uint8_t frames;
 
 #endif
