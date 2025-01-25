@@ -198,7 +198,7 @@ void enemies_update(void) {
     // once per second?
     // if((frames & 0x3F) == 0) {
     if((frames & 0x1F) == 0) {
-        r = rand8() % total_active;
+        r = (rand8() % (total_active / 2));
         for(i = 0; i < total_active; i++) {
             enemy_t *self = &ENEMIES[i];
             if(!self->active || self->sprite_t.x > SCREEN_WIDTH) {

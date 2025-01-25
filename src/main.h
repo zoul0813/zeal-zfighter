@@ -17,15 +17,15 @@
 #define WIDTH         20
 #define HEIGHT        15
 
-#define SPRITE_FLAGS    SPRITE_BEHIND_FG
+#define SPRITE_FLAGS SPRITE_BEHIND_FG
 
-#define LEVEL_LAYER     0
-#define UI_LAYER        1
-#define EMPTY_TILE      0
-#define BLANK_TILE      1
-#define ASTEROID_TILE   12
-#define STAR_TILE       24
-#define STAR_TILE_NUM   8
+#define LEVEL_LAYER   0
+#define UI_LAYER      1
+#define EMPTY_TILE    0
+#define BLANK_TILE    1
+#define ASTEROID_TILE 12
+#define STAR_TILE     24
+#define STAR_TILE_NUM 8
 
 #define LEFT1     (input1 & BUTTON_LEFT)
 #define RIGHT1    (input1 & BUTTON_RIGHT)
@@ -36,14 +36,15 @@
 #define START1    (input1 & BUTTON_START)
 #define SELECT1   (input1 & BUTTON_SELECT)
 
-#define BG_NORMAL   0x0000
-#define BG_WARN     0x50a2
-#define BG_ERROR    0x8a48
+#define BG_NORMAL 0x0000
+#define BG_WARN   0x50a2
+#define BG_ERROR  0x8a48
 
 typedef enum {
     GAME_PLAY    = 0,
     GAME_PAUSED  = 1,
     GAME_ATTRACT = 2,
+    GAME_OVER    = 3,
 } GameMode;
 
 typedef enum {

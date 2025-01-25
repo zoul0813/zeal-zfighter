@@ -51,7 +51,6 @@ int main(void)
 reset:
     load_level(0);
 
-    // game_mode = GAME_ATTRACT;
     attract_init();
     reset();
 
@@ -61,6 +60,7 @@ game_loop:
     if(game_mode != GAME_PAUSED)
         zmt_tick(&track, 1);
 
+    frames++;
     uint8_t action = input();
 
     switch(game_mode) {
@@ -73,6 +73,15 @@ game_loop:
             attract_mode();
             action = ACTION_NONE;
             break;
+        case GAME_OVER:
+            if(action == ACTION_CONTINUE) {
+                draw_gameover(false);
+                reset();
+                game_mode = GAME_PLAY;
+                goto game_loop;
+            }
+            action = ACTION_NONE;
+            break;
         // case GAME_PAUSED:
         //     goto game_loop;
         // case GAME_PLAY:
@@ -83,19 +92,22 @@ game_loop:
         case ACTION_NONE:
             if(paused == 1) {
                 paused = 2; // released pause
+                game_mode == GAME_PAUSED;
+                zmt_sound_off();
+                zmt_reset(VOL_0);
+                sound_stop_all();
                 draw_paused(true);
             }
             if(paused == 3) {
                 paused = 0; // released unpause
                 game_mode == GAME_PLAY;
+                zmt_reset(VOL_50);
                 draw_paused(false);
             }
             break;
         case ACTION_PAUSE:
             if(paused == 0) {
                 paused = 1; // requested pause
-                game_mode == GAME_PAUSED;
-                zmt_sound_off();
                 goto game_loop;
             }
             if(paused == 2) {
@@ -109,7 +121,6 @@ game_loop:
     if(paused > 0)
         goto game_loop;
 
-    frames++;
     update();
     draw();
     goto game_loop;
@@ -176,6 +187,8 @@ void init(void)
     Sound *bullet = sound_get(BULLET_SOUND);
     bullet->waveform = WAV_SAWTOOTH;
 
+    zmt_reset(VOL_50);
+
     gfx_enable_screen(1);
 }
 
@@ -198,8 +211,16 @@ void deinit(void)
 
 void reset(void)
 {
+    wave_counter = 0;
+    asteroid_wave = 5;
+    wave_type = ENEMY_WAVE;
+
     // reset your game state
     gfx_wait_vblank(&vctx);
+
+    uint16_t color = BG_NORMAL;
+    gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
+
     belt_destroy();
     for(uint8_t i = 0; i < MAX_ENEMIES; i++) {
         enemy_destroy(&ENEMIES[i]);
@@ -320,8 +341,12 @@ void destroy_player(void) {
         }
         msleep(500);
         player.lives = PLAYER_MAX_LIVES;
+        player.direction.x = DIRECTION_NONE;
+        player.direction.y = DIRECTION_NONE;
         player_score(0);
-
+        game_mode = GAME_OVER;
+        draw_gameover(true);
+        return;
     }
 
     color = BG_NORMAL;
@@ -462,7 +487,11 @@ void draw_paused(uint8_t paused)
 
 void draw_gameover(uint8_t gameover)
 {
-    (void*) gameover; // unreferenced
+    if (gameover)
+        sprintf(buffer, "GAME  OVER");
+    else
+        sprintf(buffer, "          ");
+    nprint_string(&vctx, buffer, 10, WIDTH / 2 - 5, HEIGHT / 2);
 }
 
 void draw(void)
@@ -490,8 +519,8 @@ void draw(void)
     // nprint_string(&vctx, buffer, 5, 14, 1);
 
     // DEBUG
-    // sprintf(buffer, "%02d", game_mode);
-    // nprint_string(&vctx, buffer, 2, 18, 14);
+    sprintf(buffer, "%02d", game_mode);
+    nprint_string(&vctx, buffer, 2, 18, 14);
 
     gfx_wait_end_vblank(&vctx);
 }
