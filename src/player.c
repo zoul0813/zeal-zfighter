@@ -12,8 +12,6 @@
 
 player_t player;
 
-#define SPRITE_FLAGS    SPRITE_BEHIND_FG
-
 void player_shield(uint8_t active) {
     player.shield.active = active;
     if (active) {

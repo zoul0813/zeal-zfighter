@@ -17,6 +17,8 @@
 #define WIDTH         20
 #define HEIGHT        15
 
+#define SPRITE_FLAGS    SPRITE_BEHIND_FG
+
 #define LEVEL_LAYER     0
 #define UI_LAYER        1
 #define EMPTY_TILE      0
@@ -33,6 +35,12 @@
 #define BUTTON1_A (input1 & BUTTON_A)
 #define START1    (input1 & BUTTON_START)
 #define SELECT1   (input1 & BUTTON_SELECT)
+
+typedef enum {
+    GAME_PLAY    = 0,
+    GAME_PAUSED  = 1,
+    GAME_ATTRACT = 2,
+} GameMode;
 
 typedef enum {
     ENEMY_WAVE  = 0,
@@ -54,6 +62,7 @@ void draw_gameover(uint8_t gameover);
 void draw(void);
 
 extern gfx_context vctx;
+extern char buffer[32];
 extern uint8_t frames;
 extern track_t track;
 

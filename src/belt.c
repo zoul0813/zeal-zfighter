@@ -22,61 +22,62 @@ uint8_t belt_spawn(void) {
             asteroid.tr.tile = 8;
             asteroid.bl.tile = 8;
             asteroid.br.tile = 8;
-            asteroid.tl.flags = SPRITE_NONE;
-            asteroid.tr.flags = SPRITE_FLIP_X;
-            asteroid.bl.flags = SPRITE_FLIP_Y;
-            asteroid.br.flags = SPRITE_FLIP_X | SPRITE_FLIP_Y;
+            asteroid.tl.flags = SPRITE_FLAGS;
+            asteroid.tr.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.bl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.br.flags = SPRITE_FLAGS | SPRITE_FLIP_X | SPRITE_FLIP_Y;
         } break;
         case ASTEROID_LARGE2: {
             asteroid.tl.tile = 9;
             asteroid.tr.tile = 9;
             asteroid.bl.tile = 10;
             asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_FLIP_X;
-            asteroid.tr.flags = SPRITE_NONE;
-            asteroid.bl.flags = SPRITE_NONE;
-            asteroid.br.flags = SPRITE_NONE;
+            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.tr.flags = SPRITE_FLAGS;
+            asteroid.bl.flags = SPRITE_FLAGS;
+            asteroid.br.flags = SPRITE_FLAGS;
         } break;
         case ASTEROID_LARGE3: {
             asteroid.tl.tile = 10;
             asteroid.tr.tile = 9;
             asteroid.bl.tile = 10;
             asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_FLIP_Y;
-            asteroid.tr.flags = SPRITE_NONE;
-            asteroid.bl.flags = SPRITE_NONE;
-            asteroid.br.flags = SPRITE_NONE;
+            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.tr.flags = SPRITE_FLAGS;
+            asteroid.bl.flags = SPRITE_FLAGS;
+            asteroid.br.flags = SPRITE_FLAGS;
         } break;
         case ASTEROID_LARGE4: {
             asteroid.tl.tile = 11;
             asteroid.tr.tile = 11;
             asteroid.bl.tile = 11;
             asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_FLIP_X | SPRITE_FLIP_Y;
-            asteroid.tr.flags = SPRITE_FLIP_Y;
-            asteroid.bl.flags = SPRITE_FLIP_X;
-            asteroid.br.flags = SPRITE_NONE;
+            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_X | SPRITE_FLIP_Y;
+            asteroid.tr.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.bl.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.br.flags = SPRITE_FLAGS;
         } break;
         case ASTEROID_LARGE5: {
             asteroid.tl.tile = 10;
             asteroid.tr.tile = 8;
             asteroid.bl.tile = 11;
             asteroid.br.tile = 9;
-            asteroid.tl.flags = SPRITE_FLIP_Y;
-            asteroid.tr.flags = SPRITE_FLIP_X;
-            asteroid.bl.flags = SPRITE_FLIP_X;
-            asteroid.br.flags = SPRITE_FLIP_Y;
+            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.tr.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.bl.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.br.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         } break;
-        default: {
-            asteroid.tl.tile = 8;
-            asteroid.tr.tile = 9;
-            asteroid.bl.tile = 10;
-            asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_NONE;
-            asteroid.tr.flags = SPRITE_NONE;
-            asteroid.bl.flags = SPRITE_NONE;
-            asteroid.br.flags = SPRITE_NONE;
-        }
+        // unreachable
+        // default: {
+        //     asteroid.tl.tile = 8;
+        //     asteroid.tr.tile = 9;
+        //     asteroid.bl.tile = 10;
+        //     asteroid.br.tile = 11;
+        //     asteroid.tl.flags = SPRITE_FLAGS;
+        //     asteroid.tr.flags = SPRITE_FLAGS;
+        //     asteroid.bl.flags = SPRITE_FLAGS;
+        //     asteroid.br.flags = SPRITE_FLAGS;
+        // }
     }
 
 
@@ -144,14 +145,7 @@ uint8_t belt_collide(Rect *src) {
             dst.w = SPRITE_WIDTH * 2;
             dst.h = SPRITE_WIDTH * 2;
     }
-    // return rect_collide(src, &dst);
-
-    uint8_t left = (src->x + src->w > dst.x) && (src->x + src->w < dst.x + dst.w);
-    uint8_t right = (src->x > dst.x) && (src->x < dst.x + dst.w);
-    uint8_t top = (src->y + src->h > dst.y) && (src->y + src->h < dst.y + dst.h);
-    uint8_t bottom = (src->y > dst.y) && (src->y < dst.y + dst.h);
-
-    return (left || right) && (top || bottom);
+    return rect_collide(src, &dst);
 }
 
 void belt_draw(void) {

@@ -1,21 +1,16 @@
-# shooter
+# Z-Fighter for Zeal 8-bit Computer
 
-Short description of the project
+Z-Fighter is a side-scrolling space shooter for Zeal 8-bit Computer.
 
-## Installation
+## Controls
 
-## Building from source
-
-Make sure that you have [ZDE](https://github.com/zoul0813/zeal-dev-environment) installed.
-
-Then open a terminal, go to the source directory and type the following commands:
-
-```shell
-    $ zde create zgdk
-    $ cd {project}
-    $ zde make
-```
+* SNES D-Pad, WASD, Arrows for movement (left/right/up/down)
+* SNES B to Shoot
+* SNES Start or Enter to Pause/Resume
+* SNES Select or Single Quote (`'`) to Quit
 
 ## Assets
 
-[Spritesheet](https://opengameart.org/content/space-shooter-art)
+[Space Shooter Art](https://opengameart.org/content/space-shooter-art)
+[Space Shooter Redux](https://kenney.nl/assets/space-shooter-redux)
+[Space Shooter Extension](https://kenney.nl/assets/space-shooter-extension)

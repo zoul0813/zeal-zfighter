@@ -10,14 +10,15 @@
 // asteroid belt
 
 typedef enum {
-    ASTEROID_SMALL = 0,
-    ASTEROID_LARGE1 = 1,
-    ASTEROID_LARGE2 = 2,
-    ASTEROID_LARGE3 = 3,
-    ASTEROID_LARGE4 = 4,
-    ASTEROID_LARGE5 = 5,
+    ASTEROID_SMALL  = 0,
+    ASTEROID_LARGE  = 1,
+    ASTEROID_LARGE1 = 2,
+    ASTEROID_LARGE2 = 3,
+    ASTEROID_LARGE3 = 4,
+    ASTEROID_LARGE4 = 5,
+    ASTEROID_LARGE5 = 6,
 } AsteroidSize;
-#define ASTEROID_SIZES  6
+#define ASTEROID_SIZES  7
 
 typedef struct {
     AsteroidSize size;

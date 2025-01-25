@@ -30,11 +30,10 @@ static highscore_t hiscores[10] = {
     { .initials = { 'Z', 'E', 'B' }, .score = 500 },
 };
 static char last_initials[3] = { 'A', 'A', 'A' };
-static char buffer[16];
-static uint8_t controller_mode = 1;
+static char _buffer[16];
 
-void hiscore_init(uint8_t controller) {
-    controller_mode = controller;
+void hiscore_init(void) {
+    // do nothing
 }
 
 void hiscore_show(void) {
@@ -42,8 +41,8 @@ void hiscore_show(void) {
     uint8_t i;
     for(i = 0; i < HISCORES_COUNT; i++) {
         highscore_t *score = &hiscores[i];
-        sprintf(buffer, "%.3s  %05hu", score->initials, score->score);
-        nprint_string(&vctx, buffer, 10, OFFSET_X, OFFSET_Y + i);
+        sprintf(_buffer, "%.3s  %05hu", score->initials, score->score);
+        nprint_string(&vctx, _buffer, 10, OFFSET_X, OFFSET_Y + i);
     }
 }
 
@@ -80,19 +79,16 @@ int8_t hiscore_add(uint16_t score) {
         gfx_wait_vblank(&vctx);
         if(_frames > 60) _frames = 0;
         if(_frames > 30) {
-            sprintf(buffer, " ");
+            sprintf(_buffer, " ");
         } else {
-            sprintf(buffer, "%c", c);
+            sprintf(_buffer, "%c", c);
         }
-        nprint_string(&vctx, buffer, 1, OFFSET_X + charindex, OFFSET_Y + i);
+        nprint_string(&vctx, _buffer, 1, OFFSET_X + charindex, OFFSET_Y + i);
 
         _frames++;
         gfx_wait_end_vblank(&vctx);
 
-        uint16_t input1 = keyboard_read();
-        if (controller_mode == 1) {
-            input1 |= controller_read();
-        }
+        uint16_t input1 = input_get();
 
         if(input1 != last_input) {
             if(LEFT1 || RIGHT1) {

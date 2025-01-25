@@ -5,7 +5,6 @@
 #include "bullet.h"
 #include "player.h"
 
-#define SPRITE_FLAGS    SPRITE_BEHIND_FG
 #define SPAWN_DERLAY    128
 
 enemy_t ENEMIES[MAX_ENEMIES];

@@ -1,4 +1,5 @@
 #include <zgdk.h>
+#include "main.h"
 #include "bullet.h"
 
 bullet_t BULLETS[MAX_BULLETS];
@@ -13,7 +14,7 @@ error bullet_init(void)
         bullet->sprite.tile  = BULLET_RED;
         bullet->sprite.x     = SCREEN_WIDTH + SPRITE_WIDTH;
         bullet->sprite.y     = SPRITE_HEIGHT + (i * SPRITE_HEIGHT);
-        bullet->sprite.flags = SPRITE_NONE;
+        bullet->sprite.flags = SPRITE_FLAGS;
         bullet->sprite_index = BULLET_INDEX + i;
         gfx_sprite_render(&vctx, bullet->sprite_index, &bullet->sprite);
     }

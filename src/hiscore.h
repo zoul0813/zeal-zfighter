@@ -10,7 +10,7 @@ typedef struct {
     uint16_t score;
 } highscore_t;
 
-void hiscore_init(uint8_t controller);
+void hiscore_init(void);
 
 /**
  * @brief Show the hiscore table

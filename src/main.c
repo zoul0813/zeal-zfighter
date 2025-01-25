@@ -22,7 +22,8 @@ static Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
 static uint8_t wave_counter = 0;
 static uint8_t asteroid_wave = 5;
 static WaveType wave_type = ENEMY_WAVE;
-static char text[32];
+static uint8_t paused = 0;
+static uint8_t game_mode = GAME_ATTRACT;
 
 static pattern_t pattern0;
 static pattern_t pattern1;
@@ -32,6 +33,7 @@ static pattern_t pattern3;
 // extern
 gfx_context vctx;
 uint8_t frames          = 0;
+char buffer[32];
 track_t track = {
     .title = "Shooter",
     .patterns = {
@@ -49,23 +51,69 @@ int main(void)
 reset:
     load_level(0);
 
-    attract_mode(controller_mode);
-
+    // game_mode = GAME_ATTRACT;
+    attract_init();
     reset();
 
-    while (true) {
-        TSTATE_LOG(1);
-        sound_loop();
+    // while (true) {
+game_loop:
+    sound_loop();
+    if(game_mode != GAME_PAUSED)
         zmt_tick(&track, 1);
-        uint8_t action = input();
-        if (action == ACTION_QUIT)
-            goto quit_game;
-        frames++;
 
-        update();
-        TSTATE_LOG(1);
-        draw();
+    uint8_t action = input();
+
+    switch(game_mode) {
+        case GAME_ATTRACT:
+            if(action == ACTION_CONTINUE) {
+                attract_deinit();
+                game_mode = GAME_PLAY;
+                goto game_loop;
+            }
+            attract_mode();
+            action = ACTION_NONE;
+            break;
+        // case GAME_PAUSED:
+        //     goto game_loop;
+        // case GAME_PLAY:
+        //     break;
     }
+
+    switch(action) {
+        case ACTION_NONE:
+            if(paused == 1) {
+                paused = 2; // released pause
+                draw_paused(true);
+            }
+            if(paused == 3) {
+                paused = 0; // released unpause
+                game_mode == GAME_PLAY;
+                draw_paused(false);
+            }
+            break;
+        case ACTION_PAUSE:
+            if(paused == 0) {
+                paused = 1; // requested pause
+                game_mode == GAME_PAUSED;
+                zmt_sound_off();
+                goto game_loop;
+            }
+            if(paused == 2) {
+                paused = 3; // requested unpause
+            }
+            break;
+        case ACTION_QUIT:
+            goto quit_game;
+    }
+
+    if(paused > 0)
+        goto game_loop;
+
+    frames++;
+    update();
+    draw();
+    goto game_loop;
+    // }
 quit_game:
     deinit();
     return 0;
@@ -86,22 +134,9 @@ void init(void)
 {
     zos_err_t err;
 
-    err = keyboard_init();
-    handle_error(err, "Failed to init keyboard: %d", 1);
-    err = keyboard_flush();
-    handle_error(err, "Failed to flush keyboard: %d", 1);
+    err = input_init(true);
 
-    err = controller_init();
-    handle_error(err, "Failed to init controller: %d", 1);
-    err = controller_flush();
-    handle_error(err, "Failed to flush controller: %d", 1);
-    uint16_t test = controller_read();
-    // if unconnected, we'll get back 0xFFFF (all buttons pressed)
-    if (test & 0xFFFF) {
-        controller_mode = 0;
-    }
-
-    hiscore_init(controller_mode);
+    hiscore_init();
 
     // disable the screen to prevent artifacts from showing
     gfx_enable_screen(0);
@@ -136,17 +171,6 @@ void init(void)
 
     tilemap_fill(&vctx, EMPTY_TILE, 0, 0, 0, WIDTH, HEIGHT);
     tilemap_fill(&vctx, EMPTY_TILE, 1, 0, 0, WIDTH, HEIGHT);
-
-    sprintf(text, "%05d", player.score);
-    nprint_string(&vctx, text, 5, 0, 0);
-
-    for(uint8_t l = 1; l < 4; l++) {
-        if(player.lives >= l) {
-            gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
-        } else {
-            gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
-        }
-    }
 
     sound_init();
     Sound *bullet = sound_get(BULLET_SOUND);
@@ -185,41 +209,52 @@ void reset(void)
         BULLETS[i].sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
     }
     gfx_wait_end_vblank(&vctx);
+
     msleep(100);
+
     player_spawn();
     player.lives = PLAYER_MAX_LIVES;
     player.score = 0;
 
-    keyboard_flush();
-    if(controller_mode) {
-        controller_flush();
+    sprintf(buffer, "%05d", player.score);
+    nprint_string(&vctx, buffer, 5, 0, 0);
+
+    for(uint8_t l = 1; l < 4; l++) {
+        if(player.lives >= l) {
+            gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
+        } else {
+            gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
+        }
     }
+
+    input_flush();
 
     msleep(500);
 }
 
 uint8_t input(void)
 {
-    uint16_t input1 = keyboard_read();
-    if (controller_mode == 1) {
-        input1 |= controller_read();
-    }
+    uint16_t input1 = input_get();
 
-    player.direction.x = DIRECTION_NONE;
-    player.direction.y = DIRECTION_NONE;
-    if (LEFT1)
-        player.direction.x = DIRECTION_LEFT;
-    if (RIGHT1)
-        player.direction.x = DIRECTION_RIGHT;
-    if (UP1)
-        player.direction.y = DIRECTION_UP;
-    if (DOWN1)
-        player.direction.y = DIRECTION_DOWN;
-    if (BUTTON1_B)
-        player_shoot();
-
+    if(START1)
+        return ACTION_PAUSE; // ACTION_CONTINUE
     if (SELECT1)
         return ACTION_QUIT;
+
+    if(game_mode == GAME_PLAY) {
+        player.direction.x = DIRECTION_NONE;
+        player.direction.y = DIRECTION_NONE;
+        if (LEFT1)
+            player.direction.x = DIRECTION_LEFT;
+        if (RIGHT1)
+            player.direction.x = DIRECTION_RIGHT;
+        if (UP1)
+            player.direction.y = DIRECTION_UP;
+        if (DOWN1)
+            player.direction.y = DIRECTION_DOWN;
+        if (BUTTON1_B)
+            player_shoot();
+    }
 
     input1_prev = input1;
     return 0;
@@ -268,8 +303,8 @@ error load_level(uint8_t which)
     generate_starfield1();
     generate_starfield2();
 
-    sprintf(text, "%05d", player.score);
-    nprint_string(&vctx, text, 5, 0, 0);
+    sprintf(buffer, "%05d", player.score);
+    nprint_string(&vctx, buffer, 5, 0, 0);
     player_draw_lives(0, HEIGHT-1);
 
     load_zmt(&track, 0);
@@ -279,12 +314,14 @@ error load_level(uint8_t which)
 void destroy_player(void) {
     player_destroyed();
     if(player.lives == 0) {
-        sound_stop_all();
-        gfx_wait_vblank(&vctx);
-        gfx_wait_end_vblank(&vctx);
-        msleep(500);
-        hiscore_add(player.score);
-        msleep(500);
+        if(game_mode == GAME_PLAY) {
+            sound_stop_all();
+            gfx_wait_vblank(&vctx);
+            gfx_wait_end_vblank(&vctx);
+            msleep(500);
+            hiscore_add(player.score);
+            msleep(500);
+        }
         player.lives = PLAYER_MAX_LIVES;
         player.score = 0;
     }
@@ -346,8 +383,8 @@ void update(void)
 
                         enemy_destroy(enemy);
                         player.score += 5;
-                        sprintf(text, "%05d", player.score);
-                        nprint_string(&vctx, text, 5, 0, 0);
+                        sprintf(buffer, "%05d", player.score);
+                        nprint_string(&vctx, buffer, 5, 0, 0);
                         goto next_bullet;
                     }
                 }
@@ -417,7 +454,11 @@ next_spawn:
 
 void draw_paused(uint8_t paused)
 {
-    (void*) paused; // unreferenced
+    if (paused)
+        sprintf(buffer, "PAUSED");
+    else
+        sprintf(buffer, "      ");
+    nprint_string(&vctx, buffer, 6, WIDTH / 2 - 3, HEIGHT / 2);
 }
 
 void draw_gameover(uint8_t gameover)
@@ -428,7 +469,6 @@ void draw_gameover(uint8_t gameover)
 void draw(void)
 {
     gfx_wait_vblank(&vctx);
-    TSTATE_LOG(2);
     bullet_draw();
     player_draw();
     belt_draw();
@@ -437,23 +477,23 @@ void draw(void)
     // scroll tilemap
     tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl.y >> 2));
 
-    // char text[16];
-    // sprintf(text, "%03d", wave_counter);
-    // nprint_string(&vctx, text, 3, 16, 0);
-    // sprintf(text, "%03d", wave_type);
-    // nprint_string(&vctx, text, 3, 16, 1);
+    // char buffer[16];
+    // sprintf(buffer, "%03d", wave_counter);
+    // nprint_string(&vctx, buffer, 3, 16, 0);
+    // sprintf(buffer, "%03d", wave_type);
+    // nprint_string(&vctx, buffer, 3, 16, 1);
 
     // uint8_t value;
     // DEBUG
-    // sprintf(text, "%05d", star_field_pos.y);
-    // nprint_string(&vctx, text, 5, 14, 0);
-    // sprintf(text, "%05d", player.sprite_tl.y);
-    // nprint_string(&vctx, text, 5, 14, 1);
+    // sprintf(buffer, "%05d", star_field_pos.y);
+    // nprint_string(&vctx, buffer, 5, 14, 0);
+    // sprintf(buffer, "%05d", player.sprite_tl.y);
+    // nprint_string(&vctx, buffer, 5, 14, 1);
 
-    // // DEBUG
+    // DEBUG
     // value = enemies_active();
-    // sprintf(text, "%02d", value);
-    // nprint_string(&vctx, text, 2, 18, 14);
-    TSTATE_LOG(2);
+    sprintf(buffer, "%02d", game_mode);
+    nprint_string(&vctx, buffer, 2, 18, 14);
+
     gfx_wait_end_vblank(&vctx);
 }
