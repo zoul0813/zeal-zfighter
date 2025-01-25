@@ -57,6 +57,7 @@ void player_damaged(uint8_t damage);
 uint8_t player_destroyed(void);
 void player_update(void);
 void player_move(void);
+void player_attract(void);
 void player_draw(void);
 void player_draw_lives(uint8_t x, uint8_t y);
 

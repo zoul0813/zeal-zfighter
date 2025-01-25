@@ -311,6 +311,16 @@ void player_move(void)
     player.rect.y = player.sprite_tl.y;
 }
 
+void player_attract(void) {
+    if(player.sprite_tl.x > 100) player.direction.x = DIRECTION_LEFT;
+    if(player.sprite_tl.x < 32) player.direction.x = DIRECTION_RIGHT;
+
+    if(player.sprite_tl.y > 200) player.direction.y = DIRECTION_UP;
+    if(player.sprite_tl.y < 32) player.direction.y = DIRECTION_DOWN;
+
+    player_shoot();
+}
+
 void player_draw(void)
 {
     // ignore errors

@@ -73,20 +73,20 @@ int8_t hiscore_add(uint16_t score) {
 
     hiscore_show();
 
-    uint8_t frames = 0, charindex = 0;
+    uint8_t _frames = 0, charindex = 0;
     char c = hiscore->initials[charindex];
     uint16_t input1 = 0, last_input = 0;
     while(1) {
         gfx_wait_vblank(&vctx);
-        if(frames > 60) frames = 0;
-        if(frames > 30) {
+        if(_frames > 60) _frames = 0;
+        if(_frames > 30) {
             sprintf(buffer, " ");
         } else {
             sprintf(buffer, "%c", c);
         }
         nprint_string(&vctx, buffer, 1, OFFSET_X + charindex, OFFSET_Y + i);
 
-        frames++;
+        _frames++;
         gfx_wait_end_vblank(&vctx);
 
         uint16_t input1 = keyboard_read();

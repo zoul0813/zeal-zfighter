@@ -18,6 +18,11 @@ void hiscore_init(uint8_t controller);
 void hiscore_show(void);
 
 /**
+ * @brief Hide the hiscore table
+ */
+void hiscore_hide(void);
+
+/**
  * @brief add a score to the table
  * @return -1 if score is too low, otherwise the index on the table (ie; 0 for highest score)
  */

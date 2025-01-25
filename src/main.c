@@ -13,22 +13,25 @@
 #include "belt.h"
 #include "main.h"
 #include "hiscore.h"
+#include "attract.h"
 
-gfx_context vctx;
-uint8_t controller_mode = 1;
-uint16_t input1_prev    = 0;
-uint8_t frames          = 0;
-int8_t star_field_dir    = 1;
-Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
-uint8_t wave_counter = 0;
-uint8_t asteroid_wave = 5;
-WaveType wave_type = ENEMY_WAVE;
+static uint8_t controller_mode = 1;
+static uint16_t input1_prev    = 0;
+static int8_t star_field_dir    = 1;
+static Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
+static uint8_t wave_counter = 0;
+static uint8_t asteroid_wave = 5;
+static WaveType wave_type = ENEMY_WAVE;
 static char text[32];
 
-pattern_t pattern0;
-pattern_t pattern1;
-pattern_t pattern2;
-pattern_t pattern3;
+static pattern_t pattern0;
+static pattern_t pattern1;
+static pattern_t pattern2;
+static pattern_t pattern3;
+
+// extern
+gfx_context vctx;
+uint8_t frames          = 0;
 track_t track = {
     .title = "Shooter",
     .patterns = {
@@ -44,14 +47,11 @@ int main(void)
 {
     init();
 reset:
-    reset();
-
-    // hiscore_show();
-    // hiscore_add(512);
-    // msleep(2000);
-    // hiscore_add(17384);
-
     load_level(0);
+
+    attract_mode(controller_mode);
+
+    reset();
 
     while (true) {
         TSTATE_LOG(1);
@@ -175,6 +175,27 @@ void deinit(void)
 void reset(void)
 {
     // reset your game state
+    gfx_wait_vblank(&vctx);
+    belt_destroy();
+    for(uint8_t i = 0; i < MAX_ENEMIES; i++) {
+        enemy_destroy(&ENEMIES[i]);
+    }
+    for(uint8_t i = 0; i < MAX_BULLETS; i++) {
+        BULLETS[i].active   = 0;
+        BULLETS[i].sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+    }
+    gfx_wait_end_vblank(&vctx);
+    msleep(100);
+    player_spawn();
+    player.lives = PLAYER_MAX_LIVES;
+    player.score = 0;
+
+    keyboard_flush();
+    if(controller_mode) {
+        controller_flush();
+    }
+
+    msleep(500);
 }
 
 uint8_t input(void)

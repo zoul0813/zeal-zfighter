@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <zos_errors.h>
 #include <zvb_gfx.h>
+#include <sound/tracker.h>
 
 #ifndef MAIN_H
 #define MAIN_H
@@ -54,5 +55,6 @@ void draw(void);
 
 extern gfx_context vctx;
 extern uint8_t frames;
+extern track_t track;
 
 #endif
