@@ -15,6 +15,10 @@
 #define PLAYER_MAX_HEALTH   8
 #define PLAYER_LIVES_TILE   15
 
+#define PLAYER_HIT_INDEX    77
+#define PLAYER_COLOR1   0xa9c7 /* ac3940 */
+#define PLAYER_COLOR2   0xab32 /* ac6494 */
+
 typedef struct {
         uint8_t active;
         uint8_t sprite_index;
@@ -54,6 +58,7 @@ void player_spawn(void);
 error player_deinit(void);
 void player_shoot(void);
 void player_damaged(uint8_t damage);
+void player_score(uint8_t score);
 uint8_t player_destroyed(void);
 void player_update(void);
 void player_move(void);

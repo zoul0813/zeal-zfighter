@@ -36,6 +36,10 @@
 #define START1    (input1 & BUTTON_START)
 #define SELECT1   (input1 & BUTTON_SELECT)
 
+#define BG_NORMAL   0x0000
+#define BG_WARN     0x50a2
+#define BG_ERROR    0x8a48
+
 typedef enum {
     GAME_PLAY    = 0,
     GAME_PAUSED  = 1,

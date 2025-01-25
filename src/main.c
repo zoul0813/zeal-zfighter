@@ -214,18 +214,9 @@ void reset(void)
 
     player_spawn();
     player.lives = PLAYER_MAX_LIVES;
-    player.score = 0;
+    player_score(0);
 
-    sprintf(buffer, "%05d", player.score);
-    nprint_string(&vctx, buffer, 5, 0, 0);
-
-    for(uint8_t l = 1; l < 4; l++) {
-        if(player.lives >= l) {
-            gfx_tilemap_place(&vctx, 15, 1, l-1, 14);
-        } else {
-            gfx_tilemap_place(&vctx, EMPTY_TILE, 1, l-1, 14);
-        }
-    }
+    player_draw_lives(0, HEIGHT-1);
 
     input_flush();
 
@@ -303,8 +294,7 @@ error load_level(uint8_t which)
     generate_starfield1();
     generate_starfield2();
 
-    sprintf(buffer, "%05d", player.score);
-    nprint_string(&vctx, buffer, 5, 0, 0);
+    player_score(0);
     player_draw_lives(0, HEIGHT-1);
 
     load_zmt(&track, 0);
@@ -312,19 +302,30 @@ error load_level(uint8_t which)
 }
 
 void destroy_player(void) {
+    uint16_t color;
     player_destroyed();
+    color = BG_WARN;
+    gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
+
+    msleep(500);
+
     if(player.lives == 0) {
+        color = BG_ERROR;
+        gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
+        sound_stop_all();
         if(game_mode == GAME_PLAY) {
-            sound_stop_all();
             gfx_wait_vblank(&vctx);
             gfx_wait_end_vblank(&vctx);
-            msleep(500);
             hiscore_add(player.score);
-            msleep(500);
         }
+        msleep(500);
         player.lives = PLAYER_MAX_LIVES;
-        player.score = 0;
+        player_score(0);
+
     }
+
+    color = BG_NORMAL;
+    gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
 
     wave_counter = 0;
     wave_type = ENEMY_WAVE;
@@ -382,9 +383,7 @@ void update(void)
                         bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
 
                         enemy_destroy(enemy);
-                        player.score += 5;
-                        sprintf(buffer, "%05d", player.score);
-                        nprint_string(&vctx, buffer, 5, 0, 0);
+                        player_score(5);
                         goto next_bullet;
                     }
                 }
@@ -491,9 +490,8 @@ void draw(void)
     // nprint_string(&vctx, buffer, 5, 14, 1);
 
     // DEBUG
-    // value = enemies_active();
-    sprintf(buffer, "%02d", game_mode);
-    nprint_string(&vctx, buffer, 2, 18, 14);
+    // sprintf(buffer, "%02d", game_mode);
+    // nprint_string(&vctx, buffer, 2, 18, 14);
 
     gfx_wait_end_vblank(&vctx);
 }

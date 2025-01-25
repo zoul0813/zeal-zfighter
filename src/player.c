@@ -11,6 +11,7 @@
 #define PLAYER_BR_DMG 19
 
 player_t player;
+static uint8_t damaged = 0;
 
 void player_shield(uint8_t active) {
     player.shield.active = active;
@@ -169,6 +170,8 @@ void player_spawn(void) {
     // player.sprite_bl.y     = player.sprite_tl.y + SPRITE_HEIGHT;
     // player.sprite_br.x     = player.sprite_tr.x;
     // player.sprite_br.y     = player.sprite_br.y + SPRITE_HEIGHT;
+
+    player_draw_lives(0, HEIGHT-1);
 }
 
 error player_deinit(void)
@@ -203,6 +206,9 @@ void player_shoot(void)
 }
 
 void player_damaged(uint8_t damage) {
+    // uint16_t color = PLAYER_HIT_COLOR2;
+    // gfx_palette_load(&vctx, &color, sizeof(uint16_t), PLAYER_HIT_INDEX);
+
     if(player.health <= damage) {
         player.health = 0;
         player.sprite_tl.tile = PLAYER_TL;
@@ -229,6 +235,20 @@ void player_damaged(uint8_t damage) {
     if(player.health < 2) {
         player.sprite_tr.tile = PLAYER_TR_DMG;
     }
+
+    uint16_t color = PLAYER_COLOR2;
+    gfx_palette_load(&vctx, &color, sizeof(uint16_t), PLAYER_HIT_INDEX);
+    damaged = 12;
+}
+
+void player_score(uint8_t score) {
+    if(score > 0) {
+        player.score += score;
+    } else {
+        player.score = 0;
+    }
+    sprintf(buffer, "%05d", player.score);
+    nprint_string(&vctx, buffer, 5, 0, 0);
 }
 
 uint8_t player_destroyed(void) {
@@ -243,6 +263,11 @@ uint8_t player_destroyed(void) {
 void player_update(void)
 {
     if(player.bullet_lock > 0) player.bullet_lock--;
+    if(damaged > 0) damaged--;
+    if(damaged == 0) {
+        uint16_t color = PLAYER_COLOR1;
+        gfx_palette_load(&vctx, &color, sizeof(uint16_t), PLAYER_HIT_INDEX);
+    }
 }
 
 void player_move(void)
@@ -329,6 +354,9 @@ void player_draw(void)
 
     // shield
     err = gfx_sprite_render_array(&vctx, index+4, &player.shield.sprite_tl, 8);
+
+    // uint16_t color = PLAYER_HIT_COLOR1;
+    // gfx_palette_load(&vctx, &color, sizeof(uint16_t), PLAYER_HIT_INDEX);
 }
 
 void player_draw_lives(uint8_t x, uint8_t y) {
