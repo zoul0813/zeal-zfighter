@@ -194,6 +194,8 @@ void init(void)
 
 void deinit(void)
 {
+    tilemap_scroll(0, 0, 0);
+    tilemap_scroll(1, 0, 0);
     sound_deinit();
 
     // reset screen
@@ -202,6 +204,7 @@ void deinit(void)
     error err;
     err = player_deinit();
     handle_error(err, "failed to deinit player", 1);
+
     err = bullet_deinit();
     handle_error(err, "failed to deinit bullets", 1);
 

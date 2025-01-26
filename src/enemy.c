@@ -117,7 +117,12 @@ error enemies_init(void)
 
 error enemies_deinit(void)
 {
-    return ERR_SUCCESS;
+    uint8_t i;
+    gfx_error err;
+    for(i = 0; i < MAX_ENEMIES * 2; i++) {
+        err = gfx_sprite_set_tile(&vctx, ENEMY_INDEX + i, EMPTY_TILE);
+    }
+    return err;
 }
 
 uint8_t enemies_spawn(uint16_t origin_y) {

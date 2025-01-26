@@ -24,7 +24,12 @@ error bullet_init(void)
 
 error bullet_deinit(void)
 {
-    return 0;
+    uint8_t i;
+    gfx_error err;
+    for(i = 0; i < MAX_BULLETS; i++) {
+        err = gfx_sprite_set_tile(&vctx, BULLET_INDEX + i, EMPTY_TILE);
+    }
+    return err;
 }
 
 void bullet_move(void)

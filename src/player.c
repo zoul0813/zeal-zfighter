@@ -177,11 +177,11 @@ void player_spawn(void) {
 error player_deinit(void)
 {
     gfx_error err;
-    uint8_t index = player.sprite_index;
-    err           = gfx_sprite_set_tile(&vctx, index, EMPTY_TILE);
-    err           = gfx_sprite_set_tile(&vctx, ++index, EMPTY_TILE);
-    err           = gfx_sprite_set_tile(&vctx, ++index, EMPTY_TILE);
-    err           = gfx_sprite_set_tile(&vctx, ++index, EMPTY_TILE);
+    uint8_t i;
+    for(i = 0; i < 12; i++) {
+        err = gfx_sprite_set_tile(&vctx, i, EMPTY_TILE);
+    }
+
     return err;
 }
 
