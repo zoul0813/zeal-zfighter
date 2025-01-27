@@ -48,35 +48,30 @@ error player_init(void)
     player.bullet      = 0;
     player.bullet_lock = 0;
 
-    gfx_sprite sprite = {
-        .x = 64,
-        .y = 64,
-        .flags = SPRITE_FLAGS
-    };
+    gfx_sprite sprite = {.x = 64, .y = 64, .flags = SPRITE_FLAGS};
     // ship
     {
-        player.sprite_tl = sprites_register_sprite(sprite);
-        player.sprite_tr = sprites_register_sprite(sprite);
-        player.sprite_bl = sprites_register_sprite(sprite);
+        player.sprite_tl         = sprites_register(sprite);
+        player.sprite_tr         = sprites_register(sprite);
+        player.sprite_bl         = sprites_register(sprite);
         player.sprite_bl->flags |= SPRITE_FLIP_Y;
-        player.sprite_br = sprites_register_sprite(sprite);
+        player.sprite_br         = sprites_register(sprite);
         player.sprite_br->flags |= SPRITE_FLIP_Y;
     }
 
     // shield
     {
-        player.shield_active           = 1;
-        player.sprite_shield_tl = sprites_register_sprite(sprite);
-        player.sprite_shield_t = sprites_register_sprite(sprite);
-        player.sprite_shield_tr = sprites_register_sprite(sprite);
-        player.sprite_shield_r1 = sprites_register_sprite(sprite);
+        player.shield_active    = 1;
+        player.sprite_shield_tl = sprites_register(sprite);
+        player.sprite_shield_t  = sprites_register(sprite);
+        player.sprite_shield_tr = sprites_register(sprite);
+        player.sprite_shield_r1 = sprites_register(sprite);
 
-        sprite.flags |= SPRITE_FLIP_Y;
-        player.sprite_shield_r2 = sprites_register_sprite(sprite);
-        player.sprite_shield_br = sprites_register_sprite(sprite);
-        player.sprite_shield_b = sprites_register_sprite(sprite);
-        player.sprite_shield_bl = sprites_register_sprite(sprite);
-
+        sprite.flags            |= SPRITE_FLIP_Y;
+        player.sprite_shield_r2  = sprites_register(sprite);
+        player.sprite_shield_br  = sprites_register(sprite);
+        player.sprite_shield_b   = sprites_register(sprite);
+        player.sprite_shield_bl  = sprites_register(sprite);
     }
 
     player.rect.x = player.sprite_tl->x;

@@ -30,7 +30,7 @@ static pattern_t pattern1;
 static pattern_t pattern2;
 static pattern_t pattern3;
 
-#define SPRITE_ARENA_SIZE 96
+#define SPRITE_ARENA_SIZE 64
 static gfx_sprite sprite_arena[SPRITE_ARENA_SIZE];
 
 // extern
@@ -509,8 +509,6 @@ void draw_gameover(uint8_t gameover)
 void draw(void)
 {
     gfx_wait_vblank(&vctx);
-    TSTATE_LOG(10); // total draw time
-
     // scroll tilemap
     tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl->y >> 2));
 
@@ -518,40 +516,9 @@ void draw(void)
     sprites_render(&vctx);
     TSTATE_LOG(5);
 
-
-    // TSTATE_LOG(1);
-    // bullet_draw();
-    // TSTATE_LOG(1);
-
-    // TSTATE_LOG(2);
-    // player_draw();
-    // TSTATE_LOG(2);
-
-    // TSTATE_LOG(3);
-    // belt_draw();
-    // TSTATE_LOG(3);
-
-    // TSTATE_LOG(4);
-    // enemies_draw();
-    // TSTATE_LOG(4);
-
-    // char buffer[16];
-    // sprintf(buffer, "%03d", wave_counter);
-    // nprint_string(&vctx, buffer, 3, 16, 0);
-    // sprintf(buffer, "%03d", wave_type);
-    // nprint_string(&vctx, buffer, 3, 16, 1);
-
-    // uint8_t value;
-    // DEBUG
-    // sprintf(buffer, "%05d", star_field_pos.y);
-    // nprint_string(&vctx, buffer, 5, 14, 0);
-    // sprintf(buffer, "%05d", player.sprite_tl.y);
-    // nprint_string(&vctx, buffer, 5, 14, 1);
-
     // DEBUG
     // sprintf(buffer, "%02d", game_mode);
     // nprint_string(&vctx, buffer, 2, 18, 14);
 
-    TSTATE_LOG(10); // total draw time
     gfx_wait_end_vblank(&vctx);
 }

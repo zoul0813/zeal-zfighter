@@ -121,3 +121,13 @@ int8_t hiscore_add(uint16_t score) {
 
     return i;
 }
+
+zos_err_t hiscore_save(const char *path) {
+    (void)path;
+    return ERR_NOT_IMPLEMENTED;
+}
+
+zos_err_t hiscore_load(const char *path) {
+    (void)path;
+    return ERR_NOT_IMPLEMENTED;
+}

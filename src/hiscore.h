@@ -28,4 +28,8 @@ void hiscore_hide(void);
  */
 int8_t hiscore_add(uint16_t score);
 
+zos_err_t hiscore_save(const char *path);
+
+zos_err_t hiscore_load(const char *path);
+
 #endif

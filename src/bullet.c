@@ -20,7 +20,7 @@ error bullet_init(void)
         bullet_t* bullet = &BULLETS[i];
 
         bullet->active       = 0;
-        bullet->sprite       = sprites_register_sprite(sprite);
+        bullet->sprite       = sprites_register(sprite);
         // bullet->sprite       = &BULLET_SPRITES[i];
         // bullet->sprite->tile  = BULLET_RED;
         // bullet->sprite->x     = SCREEN_WIDTH + SPRITE_WIDTH;

@@ -9,10 +9,10 @@ error belt_init(void) {
         .tile = EMPTY_TILE,
         .flags = SPRITE_FLAGS,
     };
-    asteroid.tl = sprites_register_sprite(sprite);
-    asteroid.tr = sprites_register_sprite(sprite);
-    asteroid.bl = sprites_register_sprite(sprite);
-    asteroid.br = sprites_register_sprite(sprite);
+    asteroid.tl = sprites_register(sprite);
+    asteroid.tr = sprites_register(sprite);
+    asteroid.bl = sprites_register(sprite);
+    asteroid.br = sprites_register(sprite);
     return ERR_SUCCESS;
 }
 

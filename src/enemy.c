@@ -102,17 +102,17 @@ error enemies_init(void)
 {
     // gfx_error err;
     uint8_t i;
-    uint8_t index = 0;
+    uint8_t index     = 0;
     gfx_sprite sprite = {
-        .tile = ENEMY_TILE,
+        .tile  = ENEMY_TILE,
         .flags = SPRITE_FLAGS,
     };
 
     for (i = 0; i < MAX_ENEMIES; i++) {
-        enemy_t* self      = &ENEMIES[i];
+        enemy_t* self = &ENEMIES[i];
 
-        self->sprite_t = sprites_register_sprite(sprite);
-        self->sprite_b = sprites_register_sprite(sprite);
+        self->sprite_t         = sprites_register(sprite);
+        self->sprite_b         = sprites_register(sprite);
         self->sprite_b->flags |= SPRITE_FLIP_Y;
     }
 
@@ -215,17 +215,14 @@ void enemies_update(void)
     // if((frames & 0x3F) == 0) {
     if ((frames & 0x1F) == 0) {
         r = (rand8() % (total_active >> 1));
-        for (i = 0; i < total_active; i++) {
+        for (i = r; i < MAX_ENEMIES; i++) {
             enemy_t* self = &ENEMIES[i];
-            if (!self->active || self->sprite_t->x > SCREEN_WIDTH) {
+            if ((self->active == 0) || (self->sprite_t->x < player.sprite_tr->x)) {
                 // we found our enemy, but he's inactive, use the next
                 if (r == i)
                     r++;
                 continue;
             }
-            // this isn't the enemy you're looking for
-            if (r != i)
-                continue;
 
             total_bullets++;
             if (total_bullets >= ENEMY_MAX_BULLETS)
@@ -234,11 +231,11 @@ void enemies_update(void)
 
             bullet_t* bullet = &BULLETS[total_bullets + PLAYER_MAX_BULLETS];
             if (bullet->active)
-                return; // this bullet is still in use
+                break; // this bullet is still in use
 
-            bullet->active      = 1;
+            bullet->active       = 1;
             bullet->sprite->tile = BULLET_RED;
-            bullet->direction.x = DIRECTION_LEFT;
+            bullet->direction.x  = DIRECTION_LEFT;
             bullet->sprite->x    = self->sprite_t->x;
             bullet->sprite->y    = self->sprite_b->y + 2;
             sound_play(BULLET_SOUND, 180, 2);
