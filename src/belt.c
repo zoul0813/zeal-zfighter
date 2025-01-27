@@ -2,6 +2,15 @@
 #include "belt.h"
 
 static asteroid_t asteroid;
+gfx_sprite BELT_SPRITES[4];
+
+error belt_init(void) {
+    asteroid.tl = &BELT_SPRITES[0];
+    asteroid.tr = &BELT_SPRITES[1];
+    asteroid.bl = &BELT_SPRITES[2];
+    asteroid.br = &BELT_SPRITES[3];
+    return ERR_SUCCESS;
+}
 
 uint8_t belt_spawn(void) {
     uint8_t size = rand8() % ASTEROID_SIZES;
@@ -11,88 +20,88 @@ uint8_t belt_spawn(void) {
     asteroid.size = size;
     switch(size) {
         case ASTEROID_SMALL: {
-            asteroid.tl.tile = 12;
+            asteroid.tl->tile = 12;
             // let it use whatever flags were already set, somewhat "random" orientation?
-            asteroid.tr.tile = EMPTY_TILE;
-            asteroid.bl.tile = EMPTY_TILE;
-            asteroid.br.tile = EMPTY_TILE;
+            asteroid.tr->tile = EMPTY_TILE;
+            asteroid.bl->tile = EMPTY_TILE;
+            asteroid.br->tile = EMPTY_TILE;
         } break;
         case ASTEROID_LARGE1: {
-            asteroid.tl.tile = 8;
-            asteroid.tr.tile = 8;
-            asteroid.bl.tile = 8;
-            asteroid.br.tile = 8;
-            asteroid.tl.flags = SPRITE_FLAGS;
-            asteroid.tr.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
-            asteroid.bl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-            asteroid.br.flags = SPRITE_FLAGS | SPRITE_FLIP_X | SPRITE_FLIP_Y;
+            asteroid.tl->tile = 8;
+            asteroid.tr->tile = 8;
+            asteroid.bl->tile = 8;
+            asteroid.br->tile = 8;
+            asteroid.tl->flags = SPRITE_FLAGS;
+            asteroid.tr->flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.bl->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.br->flags = SPRITE_FLAGS | SPRITE_FLIP_X | SPRITE_FLIP_Y;
         } break;
         case ASTEROID_LARGE2: {
-            asteroid.tl.tile = 9;
-            asteroid.tr.tile = 9;
-            asteroid.bl.tile = 10;
-            asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
-            asteroid.tr.flags = SPRITE_FLAGS;
-            asteroid.bl.flags = SPRITE_FLAGS;
-            asteroid.br.flags = SPRITE_FLAGS;
+            asteroid.tl->tile = 9;
+            asteroid.tr->tile = 9;
+            asteroid.bl->tile = 10;
+            asteroid.br->tile = 11;
+            asteroid.tl->flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.tr->flags = SPRITE_FLAGS;
+            asteroid.bl->flags = SPRITE_FLAGS;
+            asteroid.br->flags = SPRITE_FLAGS;
         } break;
         case ASTEROID_LARGE3: {
-            asteroid.tl.tile = 10;
-            asteroid.tr.tile = 9;
-            asteroid.bl.tile = 10;
-            asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-            asteroid.tr.flags = SPRITE_FLAGS;
-            asteroid.bl.flags = SPRITE_FLAGS;
-            asteroid.br.flags = SPRITE_FLAGS;
+            asteroid.tl->tile = 10;
+            asteroid.tr->tile = 9;
+            asteroid.bl->tile = 10;
+            asteroid.br->tile = 11;
+            asteroid.tl->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.tr->flags = SPRITE_FLAGS;
+            asteroid.bl->flags = SPRITE_FLAGS;
+            asteroid.br->flags = SPRITE_FLAGS;
         } break;
         case ASTEROID_LARGE4: {
-            asteroid.tl.tile = 11;
-            asteroid.tr.tile = 11;
-            asteroid.bl.tile = 11;
-            asteroid.br.tile = 11;
-            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_X | SPRITE_FLIP_Y;
-            asteroid.tr.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-            asteroid.bl.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
-            asteroid.br.flags = SPRITE_FLAGS;
+            asteroid.tl->tile = 11;
+            asteroid.tr->tile = 11;
+            asteroid.bl->tile = 11;
+            asteroid.br->tile = 11;
+            asteroid.tl->flags = SPRITE_FLAGS | SPRITE_FLIP_X | SPRITE_FLIP_Y;
+            asteroid.tr->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.bl->flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.br->flags = SPRITE_FLAGS;
         } break;
         case ASTEROID_LARGE5: {
-            asteroid.tl.tile = 10;
-            asteroid.tr.tile = 8;
-            asteroid.bl.tile = 11;
-            asteroid.br.tile = 9;
-            asteroid.tl.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-            asteroid.tr.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
-            asteroid.bl.flags = SPRITE_FLAGS | SPRITE_FLIP_X;
-            asteroid.br.flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.tl->tile = 10;
+            asteroid.tr->tile = 8;
+            asteroid.bl->tile = 11;
+            asteroid.br->tile = 9;
+            asteroid.tl->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+            asteroid.tr->flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.bl->flags = SPRITE_FLAGS | SPRITE_FLIP_X;
+            asteroid.br->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
         } break;
         // unreachable
         // default: {
-        //     asteroid.tl.tile = 8;
-        //     asteroid.tr.tile = 9;
-        //     asteroid.bl.tile = 10;
-        //     asteroid.br.tile = 11;
-        //     asteroid.tl.flags = SPRITE_FLAGS;
-        //     asteroid.tr.flags = SPRITE_FLAGS;
-        //     asteroid.bl.flags = SPRITE_FLAGS;
-        //     asteroid.br.flags = SPRITE_FLAGS;
+        //     asteroid.tl->tile = 8;
+        //     asteroid.tr->tile = 9;
+        //     asteroid.bl->tile = 10;
+        //     asteroid.br->tile = 11;
+        //     asteroid.tl->flags = SPRITE_FLAGS;
+        //     asteroid.tr->flags = SPRITE_FLAGS;
+        //     asteroid.bl->flags = SPRITE_FLAGS;
+        //     asteroid.br->flags = SPRITE_FLAGS;
         // }
     }
 
 
     uint16_t rx = (rand8_quick() % (SCREEN_WIDTH / 2)) + (SCREEN_WIDTH / 2) + (SPRITE_WIDTH * 2);
-    // asteroid.tr.x = SCREEN_WIDTH + SPRITE_WIDTH + SPRITE_WIDTH;
-    asteroid.tr.x = rx;
-    asteroid.tr.y = SCREEN_HEIGHT + SPRITE_HEIGHT + SPRITE_HEIGHT;
+    // asteroid.tr->x = SCREEN_WIDTH + SPRITE_WIDTH + SPRITE_WIDTH;
+    asteroid.tr->x = rx;
+    asteroid.tr->y = SCREEN_HEIGHT + SPRITE_HEIGHT + SPRITE_HEIGHT;
 
-    asteroid.tl.x = asteroid.tr.x - SPRITE_WIDTH;
-    asteroid.br.x = asteroid.tr.x;
-    asteroid.bl.x = asteroid.tr.x - SPRITE_WIDTH;
+    asteroid.tl->x = asteroid.tr->x - SPRITE_WIDTH;
+    asteroid.br->x = asteroid.tr->x;
+    asteroid.bl->x = asteroid.tr->x - SPRITE_WIDTH;
 
-    asteroid.tl.y = asteroid.tr.y;
-    asteroid.br.y = asteroid.tr.y + SPRITE_HEIGHT;
-    asteroid.bl.y = asteroid.tr.y + SPRITE_HEIGHT;
+    asteroid.tl->y = asteroid.tr->y;
+    asteroid.br->y = asteroid.tr->y + SPRITE_HEIGHT;
+    asteroid.bl->y = asteroid.tr->y + SPRITE_HEIGHT;
 
     return 0;
 }
@@ -100,17 +109,17 @@ uint8_t belt_spawn(void) {
 uint8_t belt_update(void) {
     int8_t x = asteroid.direction.x;
     int8_t y = asteroid.direction.y;
-    asteroid.tl.x += x;
-    asteroid.tr.x += x;
-    asteroid.bl.x += x;
-    asteroid.br.x += x;
+    asteroid.tl->x += x;
+    asteroid.tr->x += x;
+    asteroid.bl->x += x;
+    asteroid.br->x += x;
 
-    asteroid.tl.y += y;
-    asteroid.tr.y += y;
-    asteroid.bl.y += y;
-    asteroid.br.y += y;
+    asteroid.tl->y += y;
+    asteroid.tr->y += y;
+    asteroid.bl->y += y;
+    asteroid.br->y += y;
 
-    uint8_t offscreen = (asteroid.tr.x < SPRITE_WIDTH) || (asteroid.bl.y < SPRITE_HEIGHT);
+    uint8_t offscreen = (asteroid.tr->x < SPRITE_WIDTH) || (asteroid.bl->y < SPRITE_HEIGHT);
     if(offscreen) {
         belt_destroy();
         return 0;
@@ -120,21 +129,21 @@ uint8_t belt_update(void) {
 }
 
 void belt_destroy(void) {
-    // asteroid.tr.x = SCREEN_WIDTH + SPRITE_WIDTH + SPRITE_WIDTH;
-    // asteroid.tl.x = asteroid.tr.x - SPRITE_WIDTH;
-    // asteroid.br.x = asteroid.tr.x;
-    // asteroid.bl.x = asteroid.tr.x - SPRITE_WIDTH;
+    // asteroid.tr->x = SCREEN_WIDTH + SPRITE_WIDTH + SPRITE_WIDTH;
+    // asteroid.tl->x = asteroid.tr->x - SPRITE_WIDTH;
+    // asteroid.br->x = asteroid.tr->x;
+    // asteroid.bl->x = asteroid.tr->x - SPRITE_WIDTH;
 
-    asteroid.tl.y = SCREEN_HEIGHT + SPRITE_HEIGHT;
-    asteroid.tr.y = asteroid.tl.y;
-    asteroid.bl.y = asteroid.tl.y + SPRITE_HEIGHT;
-    asteroid.br.y = asteroid.tl.y + SPRITE_HEIGHT;
+    asteroid.tl->y = SCREEN_HEIGHT + SPRITE_HEIGHT;
+    asteroid.tr->y = asteroid.tl->y;
+    asteroid.bl->y = asteroid.tl->y + SPRITE_HEIGHT;
+    asteroid.br->y = asteroid.tl->y + SPRITE_HEIGHT;
 }
 
 uint8_t belt_collide(Rect *src) {
     Rect dst;
-    dst.x = asteroid.tl.x;
-    dst.y = asteroid.tl.y;
+    dst.x = asteroid.tl->x;
+    dst.y = asteroid.tl->y;
 
     switch(asteroid.size) {
         case ASTEROID_SMALL:
@@ -149,5 +158,5 @@ uint8_t belt_collide(Rect *src) {
 }
 
 void belt_draw(void) {
-    gfx_sprite_render_array(&vctx, BELT_INDEX, &asteroid.tl, 4);
+    gfx_sprite_render_array(&vctx, BELT_INDEX, BELT_SPRITES, 4);
 }

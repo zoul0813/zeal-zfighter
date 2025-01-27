@@ -22,13 +22,14 @@ typedef enum {
 
 typedef struct {
     AsteroidSize size;
-    gfx_sprite tl;
-    gfx_sprite tr;
-    gfx_sprite bl;
-    gfx_sprite br;
     Direction direction;
+    gfx_sprite* tl;
+    gfx_sprite* tr;
+    gfx_sprite* bl;
+    gfx_sprite* br;
 } asteroid_t;
 
+error belt_init(void);
 uint8_t belt_spawn(void);
 uint8_t belt_update(void);
 uint8_t belt_collide(Rect *src);

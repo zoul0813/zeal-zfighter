@@ -19,36 +19,37 @@
 #define PLAYER_COLOR1   0xa9c7 /* ac3940 */
 #define PLAYER_COLOR2   0xab32 /* ac6494 */
 
-typedef struct {
-        uint8_t active;
-        uint8_t sprite_index;
-        gfx_sprite sprite_tl;
-        gfx_sprite sprite_t;
-        gfx_sprite sprite_tr;
-        gfx_sprite sprite_r1;
-        gfx_sprite sprite_r2;
-        gfx_sprite sprite_br;
-        gfx_sprite sprite_b;
-        gfx_sprite sprite_bl;
-} shield_t;
+// typedef struct {
+//         uint8_t active;
+//         // uint8_t sprite_index;
+
+// } shield_t;
 
 typedef struct {
         uint8_t health;
         uint8_t lives;
         uint16_t score;
         Direction direction;
-        shield_t shield;
+        uint8_t shield_active;
         uint8_t bullet;
         uint8_t bullet_lock;
-
         Rect rect;
 
         // sprites
-        uint8_t sprite_index;
-        gfx_sprite sprite_tl;
-        gfx_sprite sprite_tr;
-        gfx_sprite sprite_bl;
-        gfx_sprite sprite_br;
+        // uint8_t sprite_index;
+        gfx_sprite* sprite_tl;
+        gfx_sprite* sprite_tr;
+        gfx_sprite* sprite_bl;
+        gfx_sprite* sprite_br;
+
+        gfx_sprite* sprite_shield_tl;
+        gfx_sprite* sprite_shield_t;
+        gfx_sprite* sprite_shield_tr;
+        gfx_sprite* sprite_shield_r1;
+        gfx_sprite* sprite_shield_r2;
+        gfx_sprite* sprite_shield_br;
+        gfx_sprite* sprite_shield_b;
+        gfx_sprite* sprite_shield_bl;
 } player_t;
 
 extern player_t player;

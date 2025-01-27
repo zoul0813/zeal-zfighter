@@ -28,9 +28,8 @@ typedef struct {
         Formation formation;
         uint8_t f_dir;
 
-        uint8_t sprite_index;
-        gfx_sprite sprite_t;
-        gfx_sprite sprite_b;
+        gfx_sprite* sprite_t;
+        gfx_sprite* sprite_b;
 } enemy_t;
 
 extern enemy_t ENEMIES[MAX_ENEMIES];
@@ -39,7 +38,6 @@ error enemies_init(void);
 error enemies_deinit(void);
 
 void enemy_move(enemy_t* self);
-void enemy_draw(enemy_t* self);
 void enemy_destroy(enemy_t *self);
 void enemies_move(void);
 void enemies_update(void);

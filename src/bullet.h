@@ -7,7 +7,7 @@
 #ifndef BULLET_H
 #define BULLET_H
 
-#define MAX_BULLETS  16
+#define MAX_BULLETS  8
 #define BULLET_INDEX 16
 #define BULLET_GREEN 13
 #define BULLET_RED   14
@@ -16,9 +16,8 @@
 
 typedef struct {
         uint8_t active;
-        uint8_t sprite_index;
-        gfx_sprite sprite;
         Direction direction;
+        gfx_sprite* sprite;
 } bullet_t;
 
 extern bullet_t BULLETS[MAX_BULLETS];

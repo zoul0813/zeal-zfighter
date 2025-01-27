@@ -92,7 +92,7 @@ game_loop:
         case ACTION_NONE:
             if(paused == 1) {
                 paused = 2; // released pause
-                game_mode == GAME_PAUSED;
+                game_mode = GAME_PAUSED;
                 zmt_sound_off();
                 zmt_reset(VOL_0);
                 sound_stop_all();
@@ -100,7 +100,7 @@ game_loop:
             }
             if(paused == 3) {
                 paused = 0; // released unpause
-                game_mode == GAME_PLAY;
+                game_mode = GAME_PLAY;
                 zmt_reset(VOL_50);
                 draw_paused(false);
             }
@@ -173,6 +173,9 @@ void init(void)
     err = enemies_init();
     handle_error(err, "failed to init enemies", 1);
 
+    err = belt_init();
+    handle_error(err, "Failed to init asteroid belt", 1);
+
     ascii_map(' ', 1, EMPTY_TILE);
     ascii_map('0', 10, 48); // 0-9
     ascii_map('A', 13, 64); // A-M
@@ -230,7 +233,7 @@ void reset(void)
     }
     for(uint8_t i = 0; i < MAX_BULLETS; i++) {
         BULLETS[i].active   = 0;
-        BULLETS[i].sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+        BULLETS[i].sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
     }
     gfx_wait_end_vblank(&vctx);
 
@@ -398,17 +401,17 @@ void update(void)
                     continue;
                 }
                 if (
-                    (bullet->sprite.x + SPRITE_WIDTH >= enemy->sprite_t.x)
+                    (bullet->sprite->x + SPRITE_WIDTH >= enemy->sprite_t->x)
                     &&
-                    (bullet->sprite.x + SPRITE_WIDTH <= enemy->sprite_t.x + SPRITE_WIDTH)
+                    (bullet->sprite->x + SPRITE_WIDTH <= enemy->sprite_t->x + SPRITE_WIDTH)
                 ) {
                     if (
-                        (bullet->sprite.y >= (enemy->sprite_t.y))
+                        (bullet->sprite->y >= (enemy->sprite_t->y))
                         &&
-                        (bullet->sprite.y <= (enemy->sprite_b.y + SPRITE_HEIGHT))
+                        (bullet->sprite->y <= (enemy->sprite_b->y + SPRITE_HEIGHT))
                     ) {
                         bullet->active   = 0;
-                        bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+                        bullet->sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
 
                         enemy_destroy(enemy);
                         player_score(5);
@@ -418,17 +421,17 @@ void update(void)
             }
         } else {
                 if (
-                    (bullet->sprite.x + SPRITE_WIDTH >= player.sprite_tl.x)
+                    (bullet->sprite->x + SPRITE_WIDTH >= player.sprite_tl->x)
                     &&
-                    (bullet->sprite.x + SPRITE_WIDTH <= player.sprite_tr.x + SPRITE_WIDTH)
+                    (bullet->sprite->x + SPRITE_WIDTH <= player.sprite_tr->x + SPRITE_WIDTH)
                 ) {
                     if (
-                        (bullet->sprite.y >= (player.sprite_tl.y))
+                        (bullet->sprite->y >= (player.sprite_tl->y))
                         &&
-                        (bullet->sprite.y <= (player.sprite_bl.y + SPRITE_HEIGHT))
+                        (bullet->sprite->y <= (player.sprite_bl->y + SPRITE_HEIGHT))
                     ) {
                         bullet->active   = 0;
-                        bullet->sprite.x = SCREEN_WIDTH + SPRITE_WIDTH;
+                        bullet->sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
 
                         player_damaged(1);
                         if(player.health == 0) {
@@ -500,13 +503,27 @@ void draw_gameover(uint8_t gameover)
 void draw(void)
 {
     gfx_wait_vblank(&vctx);
-    bullet_draw();
-    player_draw();
-    belt_draw();
-    enemies_draw();
+    TSTATE_LOG(10); // total draw time
 
     // scroll tilemap
-    tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl.y >> 2));
+    tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl->y >> 2));
+
+
+    TSTATE_LOG(1);
+    bullet_draw();
+    TSTATE_LOG(1);
+
+    TSTATE_LOG(2);
+    player_draw();
+    TSTATE_LOG(2);
+
+    TSTATE_LOG(3);
+    belt_draw();
+    TSTATE_LOG(3);
+
+    TSTATE_LOG(4);
+    enemies_draw();
+    TSTATE_LOG(4);
 
     // char buffer[16];
     // sprintf(buffer, "%03d", wave_counter);
@@ -522,8 +539,9 @@ void draw(void)
     // nprint_string(&vctx, buffer, 5, 14, 1);
 
     // DEBUG
-    sprintf(buffer, "%02d", game_mode);
-    nprint_string(&vctx, buffer, 2, 18, 14);
+    // sprintf(buffer, "%02d", game_mode);
+    // nprint_string(&vctx, buffer, 2, 18, 14);
 
+    TSTATE_LOG(10); // total draw time
     gfx_wait_end_vblank(&vctx);
 }
