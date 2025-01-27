@@ -2,13 +2,17 @@
 #include "belt.h"
 
 static asteroid_t asteroid;
-gfx_sprite BELT_SPRITES[4];
+// gfx_sprite BELT_SPRITES[4];
 
 error belt_init(void) {
-    asteroid.tl = &BELT_SPRITES[0];
-    asteroid.tr = &BELT_SPRITES[1];
-    asteroid.bl = &BELT_SPRITES[2];
-    asteroid.br = &BELT_SPRITES[3];
+    gfx_sprite sprite = {
+        .tile = EMPTY_TILE,
+        .flags = SPRITE_FLAGS,
+    };
+    asteroid.tl = sprites_register_sprite(sprite);
+    asteroid.tr = sprites_register_sprite(sprite);
+    asteroid.bl = sprites_register_sprite(sprite);
+    asteroid.br = sprites_register_sprite(sprite);
     return ERR_SUCCESS;
 }
 
@@ -157,6 +161,6 @@ uint8_t belt_collide(Rect *src) {
     return rect_collide(src, &dst);
 }
 
-void belt_draw(void) {
-    gfx_sprite_render_array(&vctx, BELT_INDEX, BELT_SPRITES, 4);
-}
+// void belt_draw(void) {
+//     gfx_sprite_render_array(&vctx, BELT_INDEX, BELT_SPRITES, 4);
+// }

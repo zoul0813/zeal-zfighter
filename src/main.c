@@ -30,6 +30,9 @@ static pattern_t pattern1;
 static pattern_t pattern2;
 static pattern_t pattern3;
 
+#define SPRITE_ARENA_SIZE 96
+static gfx_sprite sprite_arena[SPRITE_ARENA_SIZE];
+
 // extern
 gfx_context vctx;
 uint8_t frames          = 0;
@@ -163,6 +166,9 @@ void init(void)
     };
     err = load_tileset(&vctx, &options);
     handle_error(err, "failed to load tileset", 1);
+
+    err = sprites_register_arena(sprite_arena, (uint8_t)SPRITE_ARENA_SIZE);
+    handle_error(err, "Failed to initialize sprite arena", 1);
 
     err = player_init();
     handle_error(err, "failed to init player", 1);
@@ -508,22 +514,26 @@ void draw(void)
     // scroll tilemap
     tilemap_scroll(0, star_field_pos.x, star_field_pos.y + (player.sprite_tl->y >> 2));
 
+    TSTATE_LOG(5);
+    sprites_render(&vctx);
+    TSTATE_LOG(5);
 
-    TSTATE_LOG(1);
-    bullet_draw();
-    TSTATE_LOG(1);
 
-    TSTATE_LOG(2);
-    player_draw();
-    TSTATE_LOG(2);
+    // TSTATE_LOG(1);
+    // bullet_draw();
+    // TSTATE_LOG(1);
 
-    TSTATE_LOG(3);
-    belt_draw();
-    TSTATE_LOG(3);
+    // TSTATE_LOG(2);
+    // player_draw();
+    // TSTATE_LOG(2);
 
-    TSTATE_LOG(4);
-    enemies_draw();
-    TSTATE_LOG(4);
+    // TSTATE_LOG(3);
+    // belt_draw();
+    // TSTATE_LOG(3);
+
+    // TSTATE_LOG(4);
+    // enemies_draw();
+    // TSTATE_LOG(4);
 
     // char buffer[16];
     // sprintf(buffer, "%03d", wave_counter);

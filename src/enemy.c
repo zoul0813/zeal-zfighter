@@ -8,7 +8,7 @@
 #define SPAWN_DERLAY 128
 
 enemy_t ENEMIES[MAX_ENEMIES];
-gfx_sprite ENEMY_SPRITES[MAX_ENEMIES * 2];
+// gfx_sprite ENEMY_SPRITES[MAX_ENEMIES * 2];
 
 static uint8_t total_active    = 0;
 static uint8_t total_bullets   = 0;
@@ -103,19 +103,20 @@ error enemies_init(void)
     // gfx_error err;
     uint8_t i;
     uint8_t index = 0;
+    gfx_sprite sprite = {
+        .tile = ENEMY_TILE,
+        .flags = SPRITE_FLAGS,
+    };
+
     for (i = 0; i < MAX_ENEMIES; i++) {
         enemy_t* self      = &ENEMIES[i];
 
-        self->sprite_t        = &ENEMY_SPRITES[index++];
-        self->sprite_t->tile  = ENEMY_TILE;
-        self->sprite_t->flags = SPRITE_FLAGS;
-
-        self->sprite_b        = &ENEMY_SPRITES[index++];
-        self->sprite_b->tile  = ENEMY_TILE;
-        self->sprite_b->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+        self->sprite_t = sprites_register_sprite(sprite);
+        self->sprite_b = sprites_register_sprite(sprite);
+        self->sprite_b->flags |= SPRITE_FLIP_Y;
     }
 
-    enemies_draw();
+    // enemies_draw();
     enemies_spawn(SCREEN_HEIGHT / 2);
 
     return ERR_SUCCESS;
@@ -325,7 +326,7 @@ void enemies_move(void)
     }
 }
 
-void enemies_draw(void)
-{
-    gfx_sprite_render_array(&vctx, ENEMY_INDEX, ENEMY_SPRITES, MAX_ENEMIES * 2);
-}
+// void enemies_draw(void)
+// {
+//     gfx_sprite_render_array(&vctx, ENEMY_INDEX, ENEMY_SPRITES, MAX_ENEMIES * 2);
+// }

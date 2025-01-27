@@ -25,6 +25,6 @@ extern bullet_t BULLETS[MAX_BULLETS];
 error bullet_init(void);
 error bullet_deinit(void);
 void bullet_move(void);
-void bullet_draw(void);
+// void bullet_draw(void);
 
 #endif

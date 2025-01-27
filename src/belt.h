@@ -34,6 +34,6 @@ uint8_t belt_spawn(void);
 uint8_t belt_update(void);
 uint8_t belt_collide(Rect *src);
 void belt_destroy(void);
-void belt_draw(void);
+// void belt_draw(void);
 
 #endif

@@ -13,7 +13,7 @@
 player_t player;
 static uint8_t damaged = 0;
 
-gfx_sprite PLAYER_SPRITES[4 + 8]; // 4 ship, 8 shield
+// gfx_sprite PLAYER_SPRITES[4 + 8]; // 4 ship, 8 shield
 
 void player_shield(uint8_t active)
 {
@@ -48,49 +48,35 @@ error player_init(void)
     player.bullet      = 0;
     player.bullet_lock = 0;
 
+    gfx_sprite sprite = {
+        .x = 64,
+        .y = 64,
+        .flags = SPRITE_FLAGS
+    };
     // ship
     {
-        player.sprite_tl        = &PLAYER_SPRITES[index++];
-        player.sprite_tl->x     = 64;
-        player.sprite_tl->y     = 64;
-        player.sprite_tl->flags = SPRITE_FLAGS;
-
-        player.sprite_tr        = &PLAYER_SPRITES[index++];
-        player.sprite_tr->flags = SPRITE_FLAGS;
-
-        player.sprite_bl        = &PLAYER_SPRITES[index++];
-        player.sprite_bl->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-
-        player.sprite_br        = &PLAYER_SPRITES[index++];
-        player.sprite_br->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
+        player.sprite_tl = sprites_register_sprite(sprite);
+        player.sprite_tr = sprites_register_sprite(sprite);
+        player.sprite_bl = sprites_register_sprite(sprite);
+        player.sprite_bl->flags |= SPRITE_FLIP_Y;
+        player.sprite_br = sprites_register_sprite(sprite);
+        player.sprite_br->flags |= SPRITE_FLIP_Y;
     }
 
     // shield
     {
         player.shield_active           = 1;
-        player.sprite_shield_tl        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_tl->flags = SPRITE_FLAGS;
+        player.sprite_shield_tl = sprites_register_sprite(sprite);
+        player.sprite_shield_t = sprites_register_sprite(sprite);
+        player.sprite_shield_tr = sprites_register_sprite(sprite);
+        player.sprite_shield_r1 = sprites_register_sprite(sprite);
 
-        player.sprite_shield_t        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_t->flags = SPRITE_FLAGS;
+        sprite.flags |= SPRITE_FLIP_Y;
+        player.sprite_shield_r2 = sprites_register_sprite(sprite);
+        player.sprite_shield_br = sprites_register_sprite(sprite);
+        player.sprite_shield_b = sprites_register_sprite(sprite);
+        player.sprite_shield_bl = sprites_register_sprite(sprite);
 
-        player.sprite_shield_tr        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_tr->flags = SPRITE_FLAGS;
-
-        player.sprite_shield_r1        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_r1->flags = SPRITE_FLAGS;
-
-        player.sprite_shield_r2        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_r2->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-
-        player.sprite_shield_br        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_br->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-
-        player.sprite_shield_b        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_b->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
-
-        player.sprite_shield_bl        = &PLAYER_SPRITES[index++];
-        player.sprite_shield_bl->flags = SPRITE_FLAGS | SPRITE_FLIP_Y;
     }
 
     player.rect.x = player.sprite_tl->x;
@@ -157,12 +143,12 @@ void player_damaged(uint8_t damage)
     // gfx_palette_load(&vctx, &color, sizeof(uint16_t), PLAYER_HIT_INDEX);
 
     if (player.health <= damage) {
-        player.health         = 0;
+        player.health          = 0;
         player.sprite_tl->tile = PLAYER_TL;
         player.sprite_tr->tile = PLAYER_TR;
         player.sprite_bl->tile = PLAYER_TL;
         player.sprite_br->tile = PLAYER_TR;
-        player.shield_active  = 1;
+        player.shield_active   = 1;
         return;
     }
 
@@ -300,10 +286,10 @@ void player_attract(void)
     player_shoot();
 }
 
-void player_draw(void)
-{
-    gfx_sprite_render_array(&vctx, 0, PLAYER_SPRITES, 12);
-}
+// void player_draw(void)
+// {
+//     gfx_sprite_render_array(&vctx, 0, PLAYER_SPRITES, 12);
+// }
 
 void player_draw_lives(uint8_t x, uint8_t y)
 {
