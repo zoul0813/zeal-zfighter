@@ -2,6 +2,7 @@
 #include <zvb_sprite.h>
 #include <zgdk.h>
 #include "main.h"
+#include "patterns.h"
 
 #ifndef ENEMY_H
 #define ENEMY_H
@@ -13,12 +14,7 @@
 #define ENEMY_PALETTE       206
 #define ENEMY_TILE          32
 
-typedef enum {
-    F_SINE      = 0,
-    F_TRI       = 1,
-    F_SQUARE    = 2,
-    F_LINE      = 3,
-} Formation;
+
 
 typedef struct {
         uint8_t active;
@@ -41,7 +37,6 @@ void enemy_move(enemy_t* self);
 void enemy_destroy(enemy_t *self);
 void enemies_move(void);
 void enemies_update(void);
-// void enemies_draw(void);
 uint8_t enemies_spawn(uint16_t y);
 uint8_t enemies_active(void);
 #endif

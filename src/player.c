@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <zgdk.h>
 #include "player.h"
 #include "main.h"

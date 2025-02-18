@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <zos_errors.h>
 #include <zvb_gfx.h>
-#include <sound/tracker.h>
+#include <zgdk/sound/tracker.h>
 
 #ifndef MAIN_H
 #define MAIN_H
@@ -50,6 +50,7 @@ typedef enum {
 typedef enum {
     ENEMY_WAVE  = 0,
     BELT_SHOWER = 1,
+    BOSS_WAVE   = 2,
 } WaveType;
 
 typedef uint8_t error;
