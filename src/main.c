@@ -10,6 +10,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "enemy.h"
+#include "boss.h"
 #include "belt.h"
 #include "main.h"
 #include "hiscore.h"
@@ -21,7 +22,7 @@ static int8_t star_field_dir    = 1;
 static Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
 static uint8_t wave_counter = 0;
 static uint8_t asteroid_wave = 5;
-static WaveType wave_type = ENEMY_WAVE;
+static WaveType wave_type = BOSS_WAVE;
 static uint8_t paused = 0;
 static uint8_t game_mode = GAME_ATTRACT;
 
@@ -178,6 +179,9 @@ void init(void)
 
     err = enemies_init();
     handle_error(err, "failed to init enemies", 1);
+
+    err = boss_init();
+    handle_error(err, "failed to init boss", 1);
 
     err = belt_init();
     handle_error(err, "Failed to init asteroid belt", 1);
@@ -376,6 +380,7 @@ void update(void)
     player_move();
     bullet_move();
     enemies_move();
+    boss_move();
 
     player_update();
     switch(wave_type) {
@@ -392,8 +397,12 @@ void update(void)
         case ENEMY_WAVE:
             enemies_update();
             break;
+        case BOSS_WAVE:
+            boss_update();
+            break;
     }
 
+    if(boss_active()) goto boss_active;
     if (!enemies_active()) goto next_spawn;
     for (i = 0; i < MAX_BULLETS; i++) {
         bullet_t* bullet = &BULLETS[i];
@@ -468,6 +477,7 @@ next_spawn:
             wave_counter += enemies_spawn((rand8() % 64) + 88);
         }
     }
+boss_active:
 
     star_field_pos.x++;
     if(star_field_pos.x == 960) {
