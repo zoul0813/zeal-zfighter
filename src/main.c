@@ -5,6 +5,7 @@
 #include <zos_sys.h>
 #include <zos_video.h>
 #include <zgdk.h>
+#include <zgdk/tilemap/scroll.h>
 
 #include "assets.h"
 #include "player.h"

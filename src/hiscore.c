@@ -47,7 +47,7 @@ void hiscore_show(void) {
 }
 
 void hiscore_hide(void) {
-    tilemap_fill(&vctx, EMPTY_TILE, 1, 0, 0, WIDTH, HEIGHT);
+    tilemap_fill(&vctx, LAYER1, EMPTY_TILE,0, 0, WIDTH, HEIGHT);
 }
 
 int8_t hiscore_add(uint16_t score) {
