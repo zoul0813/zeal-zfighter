@@ -12,7 +12,8 @@ ifndef ZGDK_PATH
 	$(error "Failure: ZGDK_PATH variable not found. It must point to ZGDK path.")
 endif
 
-GFX_STRIP = 160
+GFX_COMPRESSED=1
+GFX_STRIP=160
 
 include $(ZGDK_PATH)/base_sdcc.mk
 
