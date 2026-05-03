@@ -3,7 +3,7 @@
 #include "main.h"
 #include "attract.h"
 #include "player.h"
-#include "hiscore.h"
+#include <zgdk/hiscore.h>
 
 #define START1    (input1 & BUTTON_START)
 #define PRESS_START     "Press  Start"

@@ -32,7 +32,6 @@ add_executable(${target_name}
     src/belt.c
     src/bullet.c
     src/enemy.c
-    src/hiscore.c
     src/patterns.c
     src/player.c
 )

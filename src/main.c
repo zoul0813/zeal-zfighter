@@ -13,7 +13,7 @@
 #include "enemy.h"
 #include "belt.h"
 #include "main.h"
-#include "hiscore.h"
+#include <zgdk/hiscore.h>
 #include "attract.h"
 
 static uint16_t input1_prev    = 0;
@@ -47,6 +47,33 @@ track_t track = {
     }
 };
 const size_t TRACK_SIZE = sizeof(track);
+
+static const highscore_t default_hiscores[HISCORES_COUNT] = {
+    { .initials = { 'D', 'P', 'H' }, .score = 4000 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 2500 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 2250 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 2000 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1750 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1500 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1250 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 1000 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 750 },
+    { .initials = { 'Z', 'E', 'B' }, .score = 500 },
+};
+
+static const hiscore_config_t hiscore_config = {
+    .context = &vctx,
+    .width = WIDTH,
+    .height = HEIGHT,
+    .layer = UI_LAYER,
+    .empty_tile = EMPTY_TILE,
+    .default_scores = default_hiscores,
+#ifdef HISCORE_PATH
+    .path = HISCORE_PATH,
+#else
+    .path = NULL,
+#endif
+};
 
 int main(void)
 {
@@ -150,7 +177,7 @@ void init(void)
 
     err = input_init(true);
 
-    hiscore_init();
+    hiscore_init(&hiscore_config);
 
     // disable the screen to prevent artifacts from showing
     gfx_enable_screen(0);
