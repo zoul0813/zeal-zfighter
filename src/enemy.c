@@ -138,18 +138,35 @@ inline uint8_t enemies_active(void)
     return total_active;
 }
 
+static bullet_t* enemy_next_bullet(void)
+{
+    for (uint8_t i = 0; i < ENEMY_MAX_BULLETS; i++) {
+        uint8_t slot = total_bullets;
+        bullet_t* bullet = &BULLETS[PLAYER_MAX_BULLETS + slot];
+
+        total_bullets++;
+        if (total_bullets >= ENEMY_MAX_BULLETS)
+            total_bullets = 0;
+
+        if (!bullet->active)
+            return bullet;
+    }
+
+    return NULL;
+}
+
 void enemies_update(void)
 {
     uint8_t i, r;
     if (total_active == 0)
         return;
 
-    frames++;
-
     // once per second?
     // if((frames & 0x3F) == 0) {
     if ((frames & 0x1F) == 0) {
-        r = (rand8() % (total_active >> 1));
+        uint8_t divisor = total_active >> 1;
+        if(divisor == 0) divisor = 1;
+        r = rand8() % divisor;
         for (i = r; i < MAX_ENEMIES; i++) {
             enemy_t* self = &ENEMIES[i];
             if ((self->active == 0) || (self->sprite_t->x < player.sprite_tr->x)) {
@@ -159,14 +176,9 @@ void enemies_update(void)
                 continue;
             }
 
-            total_bullets++;
-            if (total_bullets >= ENEMY_MAX_BULLETS)
-                ;
-            total_bullets = 0;
-
-            bullet_t* bullet = &BULLETS[total_bullets + PLAYER_MAX_BULLETS];
-            if (bullet->active)
-                break; // this bullet is still in use
+            bullet_t* bullet = enemy_next_bullet();
+            if (bullet == NULL)
+                break; // enemy bullet pool is full
 
             bullet->active       = 1;
             bullet->sprite->tile = BULLET_RED;
@@ -242,10 +254,12 @@ void enemy_move(enemy_t* self)
 
 void enemy_destroy(enemy_t* self)
 {
+    uint8_t was_active = self->active;
+
     self->active      = 0;
     self->sprite_t->x = SCREEN_WIDTH + (SPRITE_WIDTH * 2);
     self->sprite_b->x = SCREEN_WIDTH + (SPRITE_WIDTH * 2);
-    if (total_active > 0)
+    if (was_active && total_active > 0)
         total_active--;
 }
 

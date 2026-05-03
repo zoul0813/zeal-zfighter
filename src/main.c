@@ -16,7 +16,6 @@
 #include "hiscore.h"
 #include "attract.h"
 
-static uint8_t controller_mode = 1;
 static uint16_t input1_prev    = 0;
 static int8_t star_field_dir    = 1;
 static Vector2_u16 star_field_pos = { .x = 0, .y = 128 };

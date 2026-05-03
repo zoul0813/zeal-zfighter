@@ -67,7 +67,7 @@ int8_t hiscore_add(uint16_t score) {
     }
 
     // update the table with your score
-    hiscores->score = score;
+    hiscore->score = score;
     memcpy(&hiscore->initials, &last_initials, 3);
 
     hiscore_show();

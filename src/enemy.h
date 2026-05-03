@@ -3,13 +3,14 @@
 #include <zgdk.h>
 #include "main.h"
 #include "patterns.h"
+#include "bullet.h"
 
 #ifndef ENEMY_H
 #define ENEMY_H
 
 #define ENEMY_INDEX         32
 #define MAX_ENEMIES         16
-#define ENEMY_MAX_BULLETS   12
+#define ENEMY_MAX_BULLETS   ENEMY_BULLET_SLOTS
 #define ENEMY_OFFSET        48
 #define ENEMY_PALETTE       206
 #define ENEMY_TILE          32
