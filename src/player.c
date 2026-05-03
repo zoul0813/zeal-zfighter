@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <core.h>
 #include <zgdk.h>
 #include "player.h"
 #include "main.h"
@@ -177,7 +177,7 @@ void player_score(uint8_t score)
     } else {
         player.score = 0;
     }
-    sprintf(buffer, "%05d", player.score);
+    itoa_pad(player.score, buffer, 10, 'A', '0', 5);
     nprint_string(&vctx, buffer, 5, 0, 0);
 }
 

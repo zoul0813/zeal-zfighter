@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <zgdk.h>
 #include "main.h"
 #include "attract.h"
@@ -30,12 +29,10 @@ void attract_mode(void) {
     if((frames % 32) == 0) {
         blink ^= 1;
         if(blink) {
-            sprintf(buffer, "%s", PRESS_START);
-            nprint_string(&vctx, buffer, 12, 4, 14);
+            nprint_string(&vctx, PRESS_START, 12, 4, 14);
 
         } else {
-            sprintf(buffer, "%s", PRESS_BLINK);
-            nprint_string(&vctx, buffer, 12, 4, 14);
+            nprint_string(&vctx, PRESS_BLINK, 12, 4, 14);
 
         }
     }

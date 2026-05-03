@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <zgdk.h>
 #include "enemy.h"
 #include "patterns.h"

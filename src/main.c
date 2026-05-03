@@ -1,5 +1,5 @@
-#include <stdio.h>
 #include <stdint.h>
+#include <core.h>
 #include <zos_errors.h>
 #include <zos_vfs.h>
 #include <zos_sys.h>
@@ -107,6 +107,7 @@ game_loop:
             if(action == ACTION_CONTINUE) {
                 draw_gameover(false);
                 reset();
+                attract_init();
                 game_mode = GAME_ATTRACT;
                 goto game_loop;
             }
@@ -165,7 +166,12 @@ void handle_error(zos_err_t err, const char* message, uint8_t fatal)
     if (err != ERR_SUCCESS) {
         if (fatal)
             deinit();
-        printf("\nError[%d] (%02x) %s", err, err, message);
+        put_s("\nError[");
+        put_u8((uint8_t)err);
+        put_s("] (");
+        put_hex8((uint8_t)err);
+        put_s(") ");
+        put_s(message);
         if (fatal)
             exit(err);
     }
@@ -518,19 +524,17 @@ next_spawn:
 void draw_paused(uint8_t paused)
 {
     if (paused)
-        sprintf(buffer, "PAUSED");
+        nprint_string(&vctx, "PAUSED", 6, WIDTH / 2 - 3, HEIGHT / 2);
     else
-        sprintf(buffer, "      ");
-    nprint_string(&vctx, buffer, 6, WIDTH / 2 - 3, HEIGHT / 2);
+        nprint_string(&vctx, "      ", 6, WIDTH / 2 - 3, HEIGHT / 2);
 }
 
 void draw_gameover(uint8_t gameover)
 {
     if (gameover)
-        sprintf(buffer, "GAME  OVER");
+        nprint_string(&vctx, "GAME  OVER", 10, WIDTH / 2 - 5, HEIGHT / 2);
     else
-        sprintf(buffer, "          ");
-    nprint_string(&vctx, buffer, 10, WIDTH / 2 - 5, HEIGHT / 2);
+        nprint_string(&vctx, "          ", 10, WIDTH / 2 - 5, HEIGHT / 2);
 }
 
 void draw(void)
@@ -542,10 +546,6 @@ void draw(void)
     TSTATE_LOG(5);
     sprites_render(&vctx);
     TSTATE_LOG(5);
-
-    // DEBUG
-    // sprintf(buffer, "%02d", game_mode);
-    // nprint_string(&vctx, buffer, 2, 18, 14);
 
     gfx_wait_end_vblank(&vctx);
 }

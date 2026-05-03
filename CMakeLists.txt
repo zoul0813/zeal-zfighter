@@ -39,15 +39,19 @@ add_executable(${target_name}
 # # -------------------------------
 # # Include and link SDKs
 # # -------------------------------
+zos_use(coreutils)
+find_package(COREUTILS REQUIRED)
+
 zos_use(zgdk)
+find_package(ZGDK REQUIRED)
+
 zos_use(zvb)
+find_package(ZVB_SDK REQUIRED)
 
 zgdk_set_hiscore_path(${target_name})
 
-find_package(ZVB_SDK REQUIRED)
 target_link_libraries(${target_name} PUBLIC zvb_gfx zvb_sound)
-
-find_package(ZGDK REQUIRED)
+target_link_libraries(${target_name} PUBLIC core)
 target_link_libraries(${target_name} PUBLIC zgdk)
 
 # -------------------------------
