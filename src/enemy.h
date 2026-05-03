@@ -15,7 +15,7 @@
 #define ENEMY_PALETTE       206
 #define ENEMY_TILE          32
 
-
+#define ENEMY_POINTS        5
 
 typedef struct {
         uint8_t active;

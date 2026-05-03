@@ -43,6 +43,8 @@ add_executable(${target_name}
 zos_use(zgdk)
 zos_use(zvb)
 
+zgdk_set_hiscore_path(${target_name})
+
 find_package(ZVB_SDK REQUIRED)
 target_link_libraries(${target_name} PUBLIC zvb_gfx zvb_sound)
 

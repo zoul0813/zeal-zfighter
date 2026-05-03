@@ -80,7 +80,7 @@ game_loop:
             if(action == ACTION_CONTINUE) {
                 draw_gameover(false);
                 reset();
-                game_mode = GAME_PLAY;
+                game_mode = GAME_ATTRACT;
                 goto game_loop;
             }
             action = ACTION_NONE;
@@ -420,7 +420,7 @@ void update(void)
                         bullet->sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
 
                         enemy_destroy(enemy);
-                        player_score(5);
+                        player_score(ENEMY_POINTS);
                         goto next_bullet;
                     }
                 }

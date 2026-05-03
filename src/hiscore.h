@@ -1,9 +1,13 @@
 #include <stdint.h>
+#include <zos_errors.h>
 
 #ifndef HISCORE_H
 #define HISCORE_H
 
 #define HISCORES_COUNT  10
+
+#define HISCORE_FORMAT "ZHS"
+#define HISCORE_VERSION 1
 
 typedef struct {
     char initials[3];
