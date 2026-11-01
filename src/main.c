@@ -291,7 +291,7 @@ void reset(void)
 
 uint8_t input(void)
 {
-    uint16_t input1 = input_get();
+    uint16_t input1 = input_read();
 
     if(START1)
         return ACTION_PAUSE; // ACTION_CONTINUE
