@@ -16,14 +16,14 @@
 #include <zgdk/hiscore.h>
 #include "attract.h"
 
-static uint16_t input1_prev    = 0;
-static int8_t star_field_dir    = 1;
-static Vector2_u16 star_field_pos = { .x = 0, .y = 128 };
-static uint8_t wave_counter = 0;
-static uint8_t asteroid_wave = 5;
-static WaveType wave_type = ENEMY_WAVE;
-static uint8_t paused = 0;
-static uint8_t game_mode = GAME_ATTRACT;
+static uint16_t input1_prev       = 0;
+static int8_t star_field_dir      = 1;
+static Vector2_u16 star_field_pos = {.x = 0, .y = 128};
+static uint8_t wave_counter       = 0;
+static uint8_t asteroid_wave      = 5;
+static WaveType wave_type         = ENEMY_WAVE;
+static uint8_t paused             = 0;
+static uint8_t game_mode          = GAME_ATTRACT;
 
 static pattern_t pattern0;
 static pattern_t pattern1;
@@ -35,38 +35,38 @@ static gfx_sprite sprite_arena[SPRITE_ARENA_SIZE];
 
 // extern
 gfx_context vctx;
-uint8_t frames          = 0;
+uint8_t frames = 0;
 char buffer[32];
 track_t track = {
-    .title = "Shooter",
+    .title    = "Shooter",
     .patterns = {
-        &pattern0,
-        &pattern1,
-        &pattern2,
-        &pattern3,
-    }
+                 &pattern0,
+                 &pattern1,
+                 &pattern2,
+                 &pattern3,
+                 }
 };
 const size_t TRACK_SIZE = sizeof(track);
 
 static const highscore_t default_hiscores[HISCORES_COUNT] = {
-    { .initials = { 'D', 'P', 'H' }, .score = 4000 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 2500 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 2250 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 2000 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 1750 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 1500 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 1250 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 1000 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 750 },
-    { .initials = { 'Z', 'E', 'B' }, .score = 500 },
+    {.initials = {'D', 'P', 'H'}, .score = 4000},
+    {.initials = {'Z', 'E', 'B'}, .score = 2500},
+    {.initials = {'Z', 'E', 'B'}, .score = 2250},
+    {.initials = {'Z', 'E', 'B'}, .score = 2000},
+    {.initials = {'Z', 'E', 'B'}, .score = 1750},
+    {.initials = {'Z', 'E', 'B'}, .score = 1500},
+    {.initials = {'Z', 'E', 'B'}, .score = 1250},
+    {.initials = {'Z', 'E', 'B'}, .score = 1000},
+    {.initials = {'Z', 'E', 'B'},  .score = 750},
+    {.initials = {'Z', 'E', 'B'},  .score = 500},
 };
 
 static const hiscore_config_t hiscore_config = {
-    .context = &vctx,
-    .width = WIDTH,
-    .height = HEIGHT,
-    .layer = UI_LAYER,
-    .empty_tile = EMPTY_TILE,
+    .context        = &vctx,
+    .width          = WIDTH,
+    .height         = HEIGHT,
+    .layer          = UI_LAYER,
+    .empty_tile     = EMPTY_TILE,
     .default_scores = default_hiscores,
 #ifdef HISCORE_PATH
     .path = HISCORE_PATH,
@@ -87,15 +87,15 @@ reset:
     // while (true) {
 game_loop:
     sound_loop();
-    if(game_mode != GAME_PAUSED)
+    if (game_mode != GAME_PAUSED)
         zmt_tick(&track, 1);
 
     frames++;
     uint8_t action = input();
 
-    switch(game_mode) {
+    switch (game_mode) {
         case GAME_ATTRACT:
-            if(action == ACTION_CONTINUE) {
+            if (action == ACTION_CONTINUE) {
                 attract_deinit();
                 game_mode = GAME_PLAY;
                 goto game_loop;
@@ -104,7 +104,7 @@ game_loop:
             action = ACTION_NONE;
             break;
         case GAME_OVER:
-            if(action == ACTION_CONTINUE) {
+            if (action == ACTION_CONTINUE) {
                 draw_gameover(false);
                 reset();
                 attract_init();
@@ -113,43 +113,42 @@ game_loop:
             }
             action = ACTION_NONE;
             break;
-        // case GAME_PAUSED:
-        //     goto game_loop;
-        // case GAME_PLAY:
-        //     break;
+            // case GAME_PAUSED:
+            //     goto game_loop;
+            // case GAME_PLAY:
+            //     break;
     }
 
-    switch(action) {
+    switch (action) {
         case ACTION_NONE:
-            if(paused == 1) {
-                paused = 2; // released pause
+            if (paused == 1) {
+                paused    = 2; // released pause
                 game_mode = GAME_PAUSED;
                 zmt_sound_off();
                 zmt_reset(VOL_0);
                 sound_stop_all();
                 draw_paused(true);
             }
-            if(paused == 3) {
-                paused = 0; // released unpause
+            if (paused == 3) {
+                paused    = 0; // released unpause
                 game_mode = GAME_PLAY;
                 zmt_reset(VOL_50);
                 draw_paused(false);
             }
             break;
         case ACTION_PAUSE:
-            if(paused == 0) {
+            if (paused == 0) {
                 paused = 1; // requested pause
                 goto game_loop;
             }
-            if(paused == 2) {
+            if (paused == 2) {
                 paused = 3; // requested unpause
             }
             break;
-        case ACTION_QUIT:
-            goto quit_game;
+        case ACTION_QUIT: goto quit_game;
     }
 
-    if(paused > 0)
+    if (paused > 0)
         goto game_loop;
 
     update();
@@ -167,9 +166,9 @@ void handle_error(zos_err_t err, const char* message, uint8_t fatal)
         if (fatal)
             deinit();
         put_s("\nError[");
-        put_u8((uint8_t)err);
+        put_u8((uint8_t) err);
         put_s("] (");
-        put_hex8((uint8_t)err);
+        put_hex8((uint8_t) err);
         put_s(") ");
         put_s(message);
         if (fatal)
@@ -200,7 +199,7 @@ void init(void)
     err = load_tileset(&vctx, &options);
     handle_error(err, "failed to load tileset", 1);
 
-    err = sprites_register_arena(sprite_arena, (uint8_t)SPRITE_ARENA_SIZE);
+    err = sprites_register_arena(sprite_arena, (uint8_t) SPRITE_ARENA_SIZE);
     handle_error(err, "Failed to initialize sprite arena", 1);
 
     err = player_init();
@@ -226,7 +225,7 @@ void init(void)
     tilemap_fill(&vctx, EMPTY_TILE, 1, 0, 0, WIDTH, HEIGHT);
 
     sound_init();
-    Sound *bullet = sound_get(BULLET_SOUND);
+    Sound* bullet    = sound_get(BULLET_SOUND);
     bullet->waveform = WAV_SAWTOOTH;
 
     zmt_reset(VOL_50);
@@ -256,9 +255,9 @@ void deinit(void)
 
 void reset(void)
 {
-    wave_counter = 0;
+    wave_counter  = 0;
     asteroid_wave = 5;
-    wave_type = ENEMY_WAVE;
+    wave_type     = ENEMY_WAVE;
 
     // reset your game state
     gfx_wait_vblank(&vctx);
@@ -267,11 +266,11 @@ void reset(void)
     gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
 
     belt_destroy();
-    for(uint8_t i = 0; i < MAX_ENEMIES; i++) {
+    for (uint8_t i = 0; i < MAX_ENEMIES; i++) {
         enemy_destroy(&ENEMIES[i]);
     }
-    for(uint8_t i = 0; i < MAX_BULLETS; i++) {
-        BULLETS[i].active   = 0;
+    for (uint8_t i = 0; i < MAX_BULLETS; i++) {
+        BULLETS[i].active    = 0;
         BULLETS[i].sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
     }
     gfx_wait_end_vblank(&vctx);
@@ -282,7 +281,7 @@ void reset(void)
     player.lives = PLAYER_MAX_LIVES;
     player_score(0);
 
-    player_draw_lives(0, HEIGHT-1);
+    player_draw_lives(0, HEIGHT - 1);
 
     input_flush();
 
@@ -293,12 +292,12 @@ uint8_t input(void)
 {
     uint16_t input1 = input_read();
 
-    if(START1)
+    if (START1)
         return ACTION_PAUSE; // ACTION_CONTINUE
     if (SELECT1)
         return ACTION_QUIT;
 
-    if(game_mode == GAME_PLAY) {
+    if (game_mode == GAME_PLAY) {
         player.direction.x = DIRECTION_NONE;
         player.direction.y = DIRECTION_NONE;
         if (LEFT1)
@@ -320,7 +319,8 @@ uint8_t input(void)
 /**
  * generate new starfields for screens 1 and 4
  */
-void generate_starfield1(void) {
+void generate_starfield1(void)
+{
     uint8_t y, x, r, t;
     // screen 1 and 4 are always the same?
     for (y = 0; y < 15; y++) {
@@ -341,7 +341,8 @@ void generate_starfield1(void) {
 /**
  * generate new starfields for screens 2 and 3
  */
-void generate_starfield2(void) {
+void generate_starfield2(void)
+{
     uint8_t y, x, r, t;
     for (y = 0; y < 15; y++) {
         for (x = 20; x < 60; x++) {
@@ -361,13 +362,14 @@ error load_level(uint8_t which)
     generate_starfield2();
 
     player_score(0);
-    player_draw_lives(0, HEIGHT-1);
+    player_draw_lives(0, HEIGHT - 1);
 
     load_zmt(&track, 0);
     return 0;
 }
 
-void destroy_player(void) {
+void destroy_player(void)
+{
     uint16_t color;
     player_destroyed();
     color = BG_WARN;
@@ -375,17 +377,17 @@ void destroy_player(void) {
 
     msleep(500);
 
-    if(player.lives == 0) {
+    if (player.lives == 0) {
         color = BG_ERROR;
         gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
         sound_stop_all();
-        if(game_mode == GAME_PLAY) {
+        if (game_mode == GAME_PLAY) {
             gfx_wait_vblank(&vctx);
             gfx_wait_end_vblank(&vctx);
             hiscore_add(player.score);
         }
         msleep(500);
-        player.lives = PLAYER_MAX_LIVES;
+        player.lives       = PLAYER_MAX_LIVES;
         player.direction.x = DIRECTION_NONE;
         player.direction.y = DIRECTION_NONE;
         player_score(0);
@@ -398,7 +400,7 @@ void destroy_player(void) {
     gfx_palette_load(&vctx, &color, sizeof(uint16_t), 0);
 
     wave_counter = 0;
-    wave_type = ENEMY_WAVE;
+    wave_type    = ENEMY_WAVE;
     player_spawn();
 }
 
@@ -411,45 +413,38 @@ void update(void)
     enemies_move();
 
     player_update();
-    switch(wave_type) {
+    switch (wave_type) {
         case BELT_SHOWER:
-            if(belt_collide(&player.rect)) {
+            if (belt_collide(&player.rect)) {
                 belt_destroy();
                 destroy_player();
             }
-            if(!belt_update()) {
+            if (!belt_update()) {
                 wave_counter = 0;
-                wave_type = ENEMY_WAVE;
+                wave_type    = ENEMY_WAVE;
             }
             break;
-        case ENEMY_WAVE:
-            enemies_update();
-            break;
+        case ENEMY_WAVE: enemies_update(); break;
     }
 
-    if (!enemies_active()) goto next_spawn;
+    if (!enemies_active())
+        goto next_spawn;
     for (i = 0; i < MAX_BULLETS; i++) {
         bullet_t* bullet = &BULLETS[i];
         if (bullet->active == 0)
             continue;
 
-        if(bullet->direction.x == DIRECTION_RIGHT) {
+        if (bullet->direction.x == DIRECTION_RIGHT) {
             for (j = 0; j < MAX_ENEMIES; j++) {
                 enemy_t* enemy = &ENEMIES[j];
                 if (enemy->active == 0) {
                     continue;
                 }
-                if (
-                    (bullet->sprite->x + SPRITE_WIDTH >= enemy->sprite_t->x)
-                    &&
-                    (bullet->sprite->x + SPRITE_WIDTH <= enemy->sprite_t->x + SPRITE_WIDTH)
-                ) {
-                    if (
-                        (bullet->sprite->y >= (enemy->sprite_t->y))
-                        &&
-                        (bullet->sprite->y <= (enemy->sprite_b->y + SPRITE_HEIGHT))
-                    ) {
-                        bullet->active   = 0;
+                if ((bullet->sprite->x + SPRITE_WIDTH >= enemy->sprite_t->x) &&
+                    (bullet->sprite->x + SPRITE_WIDTH <= enemy->sprite_t->x + SPRITE_WIDTH)) {
+                    if ((bullet->sprite->y >= (enemy->sprite_t->y)) &&
+                        (bullet->sprite->y <= (enemy->sprite_b->y + SPRITE_HEIGHT))) {
+                        bullet->active    = 0;
                         bullet->sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
 
                         enemy_destroy(enemy);
@@ -459,63 +454,57 @@ void update(void)
                 }
             }
         } else {
-                if (
-                    (bullet->sprite->x + SPRITE_WIDTH >= player.sprite_tl->x)
-                    &&
-                    (bullet->sprite->x + SPRITE_WIDTH <= player.sprite_tr->x + SPRITE_WIDTH)
-                ) {
-                    if (
-                        (bullet->sprite->y >= (player.sprite_tl->y))
-                        &&
-                        (bullet->sprite->y <= (player.sprite_bl->y + SPRITE_HEIGHT))
-                    ) {
-                        bullet->active   = 0;
-                        bullet->sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
+            if ((bullet->sprite->x + SPRITE_WIDTH >= player.sprite_tl->x) &&
+                (bullet->sprite->x + SPRITE_WIDTH <= player.sprite_tr->x + SPRITE_WIDTH)) {
+                if ((bullet->sprite->y >= (player.sprite_tl->y)) &&
+                    (bullet->sprite->y <= (player.sprite_bl->y + SPRITE_HEIGHT))) {
+                    bullet->active    = 0;
+                    bullet->sprite->x = SCREEN_WIDTH + SPRITE_WIDTH;
 
-                        player_damaged(1);
-                        if(player.health == 0) {
-                            sound_stop_all();
-                            msleep(500);
-                            for(uint8_t e = 0; e < MAX_ENEMIES; e++) {
-                                enemy_destroy(&ENEMIES[e]);
-                            }
-
-                            destroy_player();
+                    player_damaged(1);
+                    if (player.health == 0) {
+                        sound_stop_all();
+                        msleep(500);
+                        for (uint8_t e = 0; e < MAX_ENEMIES; e++) {
+                            enemy_destroy(&ENEMIES[e]);
                         }
 
-                        goto next_bullet;
+                        destroy_player();
                     }
+
+                    goto next_bullet;
                 }
+            }
         }
 next_bullet:
     }
 
     if (!enemies_active()) {
 next_spawn:
-        if(wave_counter >= asteroid_wave) {
-            wave_type = BELT_SHOWER;
-            wave_counter = belt_spawn();
+        if (wave_counter >= asteroid_wave) {
+            wave_type     = BELT_SHOWER;
+            wave_counter  = belt_spawn();
             asteroid_wave = rand8_quick() % 10 + 2;
         }
-        if(wave_type == ENEMY_WAVE) {
+        if (wave_type == ENEMY_WAVE) {
             wave_counter += enemies_spawn((rand8() % 64) + 88);
         }
     }
 
     star_field_pos.x++;
-    if(star_field_pos.x == 960) {
+    if (star_field_pos.x == 960) {
         // generate new fields for panels 2 and 3
         star_field_pos.x = 0;
         generate_starfield2();
     }
-    if(star_field_pos.x == 480) {
+    if (star_field_pos.x == 480) {
         // generate new field for panels 1 and 4
         generate_starfield1();
     }
 
-    if(frames % 32 == 0) {
+    if (frames % 32 == 0) {
         star_field_pos.y += star_field_dir;
-        if(star_field_pos.y == 239 || star_field_pos.y == 0) {
+        if (star_field_pos.y == 239 || star_field_pos.y == 0) {
             star_field_dir *= -1;
         }
     }
@@ -524,17 +513,17 @@ next_spawn:
 void draw_paused(uint8_t paused)
 {
     if (paused)
-        nprint_string(&vctx, "PAUSED", 6, WIDTH / 2 - 3, HEIGHT / 2);
+        hud_tilemap_nput_s(&vctx, "PAUSED", 6, WIDTH / 2 - 3, HEIGHT / 2);
     else
-        nprint_string(&vctx, "      ", 6, WIDTH / 2 - 3, HEIGHT / 2);
+        hud_tilemap_nput_s(&vctx, "      ", 6, WIDTH / 2 - 3, HEIGHT / 2);
 }
 
 void draw_gameover(uint8_t gameover)
 {
     if (gameover)
-        nprint_string(&vctx, "GAME  OVER", 10, WIDTH / 2 - 5, HEIGHT / 2);
+        hud_tilemap_nput_s(&vctx, "GAME  OVER", 10, WIDTH / 2 - 5, HEIGHT / 2);
     else
-        nprint_string(&vctx, "          ", 10, WIDTH / 2 - 5, HEIGHT / 2);
+        hud_tilemap_nput_s(&vctx, "          ", 10, WIDTH / 2 - 5, HEIGHT / 2);
 }
 
 void draw(void)

@@ -42,11 +42,11 @@ add_executable(${target_name}
 zos_use(coreutils)
 find_package(COREUTILS REQUIRED)
 
-zos_use(zgdk)
-find_package(ZGDK REQUIRED)
-
 zos_use(zvb)
 find_package(ZVB_SDK REQUIRED)
+
+zos_use(zgdk)
+find_package(ZGDK REQUIRED)
 
 zgdk_set_hiscore_path(${target_name})
 

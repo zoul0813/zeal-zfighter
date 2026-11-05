@@ -178,7 +178,7 @@ void player_score(uint8_t score)
         player.score = 0;
     }
     itoa_pad(player.score, buffer, 10, 'A', '0', 5);
-    nprint_string(&vctx, buffer, 5, 0, 0);
+    hud_tilemap_nput_s(&vctx, buffer, 5, 0, 0);
 }
 
 uint8_t player_destroyed(void)
